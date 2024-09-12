@@ -1,0 +1,28 @@
+# k apply -f deployment.yml
+# k port-forward deployment.apps/file-processing-deployment 8000:3000 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-processing-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-processing
+  template:
+    metadata:
+      labels:
+        app: file-processing
+    spec:
+      volumes:
+      - name: storage
+        emptyDir: {}
+      containers:
+      - name: file-api
+        image: reprostat/file-api:dev
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - mountPath: /app/storage
+          name: storage
