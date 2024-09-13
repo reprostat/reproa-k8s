@@ -1,0 +1,146 @@
+/* styles.css */
+
+/* Basic reset for padding and margin */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1c1e29; /* Dark background for a modern neuroimaging feel */
+    color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+h2 {
+    margin-bottom: 15px;
+    font-size: 28px;
+    color: #00e6e6; /* Bright color, reminiscent of MRI or fMRI scans */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+form {
+    background-color: #262837; /* Card-like dark blue background */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    width: 350px;
+    margin-bottom: 30px;
+}
+
+label {
+    font-size: 18px;
+    color: #a3f7ff;
+    margin-bottom: 10px;
+}
+
+input[type="file"] {
+    margin-bottom: 20px;
+    border: 1px solid #00e6e6;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #1f2235;
+    color: #00e6e6;
+}
+
+input[type="submit"] {
+    background-color: #00e6e6;
+    color: #1c1e29;
+    font-size: 18px;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #00b3b3; /* Darker shade on hover */
+}
+
+hr {
+    border: 1px solid #393a50;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+#fileList {
+    width: 350px;
+    background-color: #262837;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+a {
+    color: #a3f7ff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+a:hover {
+    color: #00e6e6;
+}
+
+/* Visuals for the theme */
+body::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: url('https://www.svgrepo.com/download/39705/brain.svg');
+    bachttps://www.svgrepo.com/download/39705/brain.svgkground-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    filter: blur(2px);
+    transform: translateX(-50%) scaleY(-1);
+    z-index: -1;
+}
+
+/* Floating animated circles representing brain waves */
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,230,230,0.1), rgba(163,247,255,0)); /* Increased opacity */
+    animation: float 6s ease-in-out infinite;
+    z-index: 0; /* Ensure circles are visible behind content */
+}
+
+.circle:nth-child(1) {
+    width: 15vw;
+    height: 15vw;
+    top: 15%;
+    left: 15%;
+    animation-duration: 7s;
+}
+
+.circle:nth-child(2) {
+    width: 20vw;
+    height: 20vw;
+    bottom: 15%;
+    right: 15%;
+    animation-duration: 10s;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-30px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
