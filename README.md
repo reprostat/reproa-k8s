@@ -19,7 +19,9 @@ kubectl apply -f deployment.yml
 ##### Port-forward
 ```bash
 kubectl port-forward deployment.apps/file-processing-deployment 8080:8000 &
+PID1=$!
 kubectl port-forward deployment.apps/file-processing-deployment 8081:8001 &
+PID2=$!
 ```
 
 ##### Service
@@ -37,4 +39,6 @@ kubectl exec $POD -c file-api -it -- bash
 ### 5. Stop
 ```bash
 kubectl delete -f deployment.yml && k wait --for=delete $POD --timeout=60s
+kill $PID1
+kill $PID2
 ```
