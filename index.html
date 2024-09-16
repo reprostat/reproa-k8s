@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload, Browse, and Download</title>
+    <title>Folder Upload, Browse, and Download</title>
     <!-- Link to external CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<h2>File Upload</h2>
+<h2>Folder Upload</h2>
 <form id="uploadForm" enctype="multipart/form-data">
-  <label for="file">Select file to upload:</label>
-  <input type="file" name="file" id="file" required>
-  <input type="submit" value="Upload File">
+  <label for="files">Select folder to upload:</label>
+  <!-- Allow selecting folders and multiple files -->
+  <input type="file" name="files[]" id="files" multiple webkitdirectory required>
+  <input type="submit" value="Upload Folder">
 </form>
 
 <hr>
@@ -39,12 +40,12 @@
     })
     .then(response => response.json())
     .then(data => {
-      console.log('File uploaded successfully:', data);
+      console.log('Files uploaded successfully:', data);
       // Reload the page after successful upload
       window.location.reload();
     })
     .catch(error => {
-      console.error('Error uploading file:', error);
+      console.error('Error uploading folder:', error);
     });
   });
 

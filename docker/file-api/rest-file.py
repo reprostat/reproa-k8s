@@ -21,28 +21,42 @@ CORS(app)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Upload endpoint
+# Upload endpoint - allows folder upload by handling multiple files
 @app.route('/upload', methods=['POST'])
-def upload_file():
-    # Check if the request has the file part
-    if 'file' not in request.files:
-        return jsonify({'message': 'No file part in the request'}), 400
-    file = request.files['file']
+def upload_files():
+    # Check if files were uploaded
+    if 'files[]' not in request.files:
+        return jsonify({'message': 'No files part in the request'}), 400
     
-    # If user does not select a file
-    if file.filename == '':
-        return jsonify({'message': 'No file selected'}), 400
+    # Get the list of files
+    files = request.files.getlist('files[]')
     
-    # Save the file if it is valid
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)  # Secure the filename
-        file.save(os.path.join(STORAGE_FOLDER, filename))
-        return jsonify({'message': 'File uploaded successfully', 'file': filename}), 200
-    else:
-        return jsonify({'message': 'File type not allowed'}), 400
+    if not files:
+        return jsonify({'message': 'No files selected'}), 400
+
+    # Process each file
+    saved_files = []
+    for file in files:
+        if file and allowed_file(file.filename):
+            # Extract folder path if the browser sends it (Chrome/Edge provide folder path info in file.filename)
+            full_filename = secure_filename(file.filename)
+            subfolder = os.path.dirname(full_filename)  # Get the folder path
+
+            # Create subfolder if it doesn't exist
+            folder_path = os.path.join(STORAGE_FOLDER, subfolder)
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+
+            # Save the file inside the folder
+            file.save(os.path.join(folder_path, os.path.basename(full_filename)))
+            saved_files.append(full_filename)
+        else:
+            return jsonify({'message': 'File type not allowed', 'file': file.filename}), 400
+    
+    return jsonify({'message': 'Files uploaded successfully', 'files': saved_files}), 200
 
 # Download endpoint
-@app.route('/download/<filename>', methods=['GET'])
+@app.route('/download/<path:filename>', methods=['GET'])
 def download_file(filename):
     try:
         return send_from_directory(STORAGE_FOLDER, filename, as_attachment=True)
@@ -53,7 +67,11 @@ def download_file(filename):
 @app.route('/files', methods=['GET'])
 def list_files():
     try:
-        files = os.listdir(STORAGE_FOLDER)
+        files = []
+        for root, dirs, file_list in os.walk(STORAGE_FOLDER):
+            for file in file_list:
+                # Append relative path of the file to the list
+                files.append(os.path.relpath(os.path.join(root, file), STORAGE_FOLDER))
         return jsonify(files), 200
     except Exception as e:
         return jsonify({'message': f'Unable to scan directory: {str(e)}'}), 500
