@@ -14,11 +14,21 @@ spec:
     spec:
       volumes:
       - name: storage
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: 10Gi
       containers:
       - name: file-api
         image: reprostat/file-api:dev
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+            ephemeral-storage: 10Gi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+            ephemeral-storage: 50Gi
         ports:
         - containerPort: 8000
         volumeMounts:
