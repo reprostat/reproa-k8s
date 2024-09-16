@@ -1,5 +1,5 @@
 # k apply -f deployment.yml
-# k port-forward deployment.apps/file-processing-deployment 8000:3000 
+# k port-forward deployment.apps/file-processing-deployment 8000:8000 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
