@@ -34,3 +34,22 @@ spec:
         volumeMounts:
         - mountPath: /app/storage
           name: storage
+
+      - name: data-processor
+        image: reprostat/data-processor:demo
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+            ephemeral-storage: 10Gi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+            ephemeral-storage: 50Gi
+        ports:
+        - containerPort: 8001
+        volumeMounts:
+        - mountPath: /app/storage
+          name: storage
+        command: ["python", "processor.py"]

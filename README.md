@@ -18,7 +18,8 @@ kubectl apply -f deployment.yml
 #### Expose
 ##### Port-forward
 ```bash
-kubectl port-forward deployment.apps/file-processing-deployment 8080:8000
+kubectl port-forward deployment.apps/file-processing-deployment 8080:8000 &
+kubectl port-forward deployment.apps/file-processing-deployment 8081:8001 &
 ```
 
 ##### Service

@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Folder Upload, Browse, and Download</title>
-    <!-- Link to external CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<div class="spinner" id="spinner"></div>
+
 <h2>Folder Upload</h2>
 <form id="uploadForm" enctype="multipart/form-data">
   <label for="files">Select folder to upload:</label>
-  <!-- Allow selecting folders and multiple files -->
   <input type="file" name="files[]" id="files" multiple webkitdirectory required>
   <input type="submit" value="Upload Folder">
 </form>
@@ -22,6 +22,11 @@
 <h2>Uploaded Files</h2>
 <div id="fileList"></div>
 
+<hr>
+
+<!-- Button to trigger data processing -->
+<button id="processFilesBtn">Process Files</button>
+
 <!-- Floating brainwave circles -->
 <div>
     <span class="circle"></span>
@@ -29,10 +34,18 @@
 </div>
 
 <script>
-  document.getElementById('uploadForm').addEventListener('submit', function(event) {
+  const uploadForm = document.getElementById('uploadForm');
+  const spinner = document.getElementById('spinner');
+  const body = document.body;
+
+  uploadForm.addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the default form submission
 
     const formData = new FormData(this);
+
+    // Show spinner and add blur effect
+    spinner.style.display = 'block';
+    body.classList.add('blurred');
 
     fetch('http://localhost:8080/upload', {
       method: 'POST',
@@ -41,11 +54,44 @@
     .then(response => response.json())
     .then(data => {
       console.log('Files uploaded successfully:', data);
-      // Reload the page after successful upload
-      window.location.reload();
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+
+      window.location.reload(); // Reload to show updated file list
     })
     .catch(error => {
       console.error('Error uploading folder:', error);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+    });
+  });
+
+  document.getElementById('processFilesBtn').addEventListener('click', function() {
+    // Show spinner and add blur effect
+    spinner.style.display = 'block';
+    body.classList.add('blurred');
+
+    // Send a request to trigger file processing
+    fetch('http://localhost:8081/process-files', {
+      method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Processing complete:', data);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+
+      // Optionally refresh the page to reflect the results
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error processing files:', error);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
     });
   });
 
@@ -61,7 +107,7 @@
             fileLink.href = `http://localhost:8080/download/${file}`;
             fileLink.textContent = file;
             fileList.appendChild(fileLink);
-            fileList.appendChild(document.createElement('br')); // Add line break
+            fileList.appendChild(document.createElement('br'));
           });
         } else {
           fileList.textContent = 'No files uploaded yet.';
