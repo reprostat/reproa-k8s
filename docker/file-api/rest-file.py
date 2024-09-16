@@ -1,25 +1,22 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import os
 from werkzeug.utils import secure_filename
+from pathlib import Path
 
-# Define storage folder
-STORAGE_FOLDER = 'storage'
+# Define storage folder using pathlib
+STORAGE_FOLDER = Path('storage')
 
 # Ensure storage folder exists
-if not os.path.exists(STORAGE_FOLDER):
-    os.makedirs(STORAGE_FOLDER)
+STORAGE_FOLDER.mkdir(parents=True, exist_ok=True)
 
 # Allowed file extensions (optional, can add checks)
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'.m', '.xml', # workflow
+                      '.json',
+                      '.txt', '.pdf', '.png', '.jpg', '.gif'} # report
 
 # Create Flask app
 app = Flask(__name__)
 CORS(app)
-
-# Check if file extension is allowed
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Upload endpoint - allows folder upload by handling multiple files
 @app.route('/upload', methods=['POST'])
@@ -37,21 +34,20 @@ def upload_files():
     # Process each file
     saved_files = []
     for file in files:
-        if file and allowed_file(file.filename):
-            # Extract folder path if the browser sends it (Chrome/Edge provide folder path info in file.filename)
-            full_filename = secure_filename(file.filename)
-            subfolder = os.path.dirname(full_filename)  # Get the folder path
+        if Path(file.filename).suffix in ALLOWED_EXTENSIONS:
+            # Secure the filename and construct the full file path using pathlib
+            full_filename = Path(file.filename)
+            full_filename = full_filename.with_name(secure_filename(full_filename.name))
+            file_path = STORAGE_FOLDER / full_filename
+            
+            # Create parent directories if necessary
+            file_path.parent.mkdir(parents=True, exist_ok=True)
 
-            # Create subfolder if it doesn't exist
-            folder_path = os.path.join(STORAGE_FOLDER, subfolder)
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
-
-            # Save the file inside the folder
-            file.save(os.path.join(folder_path, os.path.basename(full_filename)))
-            saved_files.append(full_filename)
+            # Save the file
+            file.save(file_path)
+            saved_files.append(str(file_path.relative_to(STORAGE_FOLDER)))
         else:
-            return jsonify({'message': 'File type not allowed', 'file': file.filename}), 400
+            return jsonify({'message': f'File type not allowed for file: {file.filename}'}), 400
     
     return jsonify({'message': 'Files uploaded successfully', 'files': saved_files}), 200
 
@@ -59,7 +55,11 @@ def upload_files():
 @app.route('/download/<path:filename>', methods=['GET'])
 def download_file(filename):
     try:
-        return send_from_directory(STORAGE_FOLDER, filename, as_attachment=True)
+        # Construct the full file path using pathlib
+        file_path = STORAGE_FOLDER / filename
+        
+        # Use send_from_directory with pathlib's parts
+        return send_from_directory(STORAGE_FOLDER, file_path.relative_to(STORAGE_FOLDER), as_attachment=True)
     except FileNotFoundError:
         return jsonify({'message': f'File {filename} not found'}), 404
 
@@ -67,11 +67,8 @@ def download_file(filename):
 @app.route('/files', methods=['GET'])
 def list_files():
     try:
-        files = []
-        for root, dirs, file_list in os.walk(STORAGE_FOLDER):
-            for file in file_list:
-                # Append relative path of the file to the list
-                files.append(os.path.relpath(os.path.join(root, file), STORAGE_FOLDER))
+        # Walk through the storage folder and list all files
+        files = [str(path.relative_to(STORAGE_FOLDER)) for path in STORAGE_FOLDER.rglob('*') if path.is_file()]
         return jsonify(files), 200
     except Exception as e:
         return jsonify({'message': f'Unable to scan directory: {str(e)}'}), 500
