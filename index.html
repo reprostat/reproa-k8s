@@ -34,7 +34,7 @@
 
     const formData = new FormData(this);
 
-    fetch('http://localhost:8000/upload', {
+    fetch('http://localhost:8080/upload', {
       method: 'POST',
       body: formData
     })
@@ -50,7 +50,7 @@
   });
 
   function fetchFiles() {
-    fetch('http://localhost:8000/files')
+    fetch('http://localhost:8080/files')
       .then(response => response.json())
       .then(files => {
         const fileList = document.getElementById('fileList');
@@ -58,7 +58,7 @@
         if (files.length > 0) {
           files.forEach(file => {
             const fileLink = document.createElement('a');
-            fileLink.href = `http://localhost:8000/download/${file}`;
+            fileLink.href = `http://localhost:8080/download/${file}`;
             fileLink.textContent = file;
             fileList.appendChild(fileLink);
             fileList.appendChild(document.createElement('br')); // Add line break

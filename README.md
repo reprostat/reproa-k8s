@@ -16,15 +16,16 @@ kubectl apply -f deployment.yml
 ```
 
 #### Expose
+##### Port-forward
+```bash
+kubectl port-forward deployment.apps/file-processing-deployment 8080:8000
+```
+
 ##### Service
 ```bash
 k apply -f service.yml
 ```
-
-##### Port-forward
-```bash
-kubectl port-forward deployment.apps/file-processing-deployment 8000:8000
-```
+You need to change the hostname in _index.html_ from "_localhost_" to the IP of the service.
 
 ### 3. Access pod
 ```bash
