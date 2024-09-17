@@ -1,3 +1,5 @@
+# reprostat/reproa-k8s_data-processor:demo
+
 # Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
@@ -5,7 +7,7 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Copy everything into the container
-COPY . .
+COPY *.* ./
 
 # Install any required Python packages (add here if needed)
 RUN pip install --no-cache-dir -r requirements.txt

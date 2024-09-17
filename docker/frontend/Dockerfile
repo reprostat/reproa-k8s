@@ -1,3 +1,5 @@
+# reprostat/reproa-k8s_frontend:dev
+
 # Use the official Nginx image
 FROM nginx:alpine
 
