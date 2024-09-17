@@ -17,8 +17,21 @@ spec:
         emptyDir:
           sizeLimit: 10Gi
       containers:
+      - name: frontend
+        image: reprostat/reproa-k8s_frontend:dev
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        ports:
+        - containerPort: 80
+
       - name: file-api
-        image: reprostat/file-api:dev
+        image: reprostat/reproa-k8s_file-api:dev
         imagePullPolicy: Always
         resources:
           requests:
@@ -36,16 +49,16 @@ spec:
           name: storage
 
       - name: data-processor
-        image: reprostat/data-processor:demo
+        image: reprostat/reproa-k8s_data-processor:demo
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: 100m
-            memory: 64Mi
+            cpu: 500m
+            memory: 128Mi
             ephemeral-storage: 10Gi
           limits:
-            cpu: 200m
-            memory: 128Mi
+            cpu: 1
+            memory: 1024Mi
             ephemeral-storage: 50Gi
         ports:
         - containerPort: 8001
