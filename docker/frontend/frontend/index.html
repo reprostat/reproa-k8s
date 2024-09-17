@@ -47,7 +47,7 @@
     spinner.style.display = 'block';
     body.classList.add('blurred');
 
-    fetch('http://localhost:8080/upload', {
+    fetch('/api/files/upload', {
       method: 'POST',
       body: formData
     })
@@ -74,7 +74,7 @@
     body.classList.add('blurred');
 
     // Send a request to trigger file processing
-    fetch('http://localhost:8081/process-files', {
+    fetch('/api/process/process-files', {
       method: 'POST'
     })
     .then(response => response.json())
@@ -96,7 +96,7 @@
   });
 
   function fetchFiles() {
-    fetch('http://localhost:8080/files')
+    fetch('/api/files/files')
       .then(response => response.json())
       .then(files => {
         const fileList = document.getElementById('fileList');
@@ -104,7 +104,7 @@
         if (files.length > 0) {
           files.forEach(file => {
             const fileLink = document.createElement('a');
-            fileLink.href = `http://localhost:8080/download/${file}`;
+            fileLink.href = `/api/files/download/${file}`;
             fileLink.textContent = file;
             fileList.appendChild(fileLink);
             fileList.appendChild(document.createElement('br'));
