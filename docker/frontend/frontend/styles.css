@@ -100,10 +100,11 @@ margin: 0 5px;
 padding: 10px 20px;
 border: none;
 border-radius: 5px;
-color: #a3f7ff;
+font-size: 16px;
+background-color: #a3f7ffce;
 }
-.button-style:hover {
-background-color: #00e6e6;
+.button-group-style:hover {
+background-color: #00e6e6c7;
 }
 
 /* Visuals for the theme */
