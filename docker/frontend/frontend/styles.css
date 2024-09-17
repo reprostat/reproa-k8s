@@ -91,6 +91,21 @@ a:hover {
     color: #00e6e6;
 }
 
+.button-group-container {
+    text-align: center;
+}
+.button-group-style {
+display: inline-block;
+margin: 0 5px;
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+color: #a3f7ff;
+}
+.button-style:hover {
+background-color: #00e6e6;
+}
+
 /* Visuals for the theme */
 body::before {
     content: '';

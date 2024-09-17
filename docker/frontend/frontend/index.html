@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folder Upload, Browse, and Download</title>
+    <title>reproa-k8s</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -24,8 +24,12 @@
 
 <hr>
 
-<!-- Button to trigger data processing -->
-<button id="processFilesBtn">Process Files</button>
+<div class="button-group-container">
+  <!-- Button to trigger clearing storage -->
+  <button id="clearStorageBtn" class="button-group-style">Clear Storage</button>
+  <!-- Button to trigger data processing -->
+  <button id="processFilesBtn" class="button-group-style">Process Files</button>
+</div>
 
 <!-- Floating brainwave circles -->
 <div>
@@ -62,6 +66,33 @@
     })
     .catch(error => {
       console.error('Error uploading folder:', error);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+    });
+  });
+
+  document.getElementById('clearStorageBtn').addEventListener('click', function() {
+    // Show spinner and add blur effect
+    spinner.style.display = 'block';
+    body.classList.add('blurred');
+
+    // Send a request to trigger file processing
+    fetch('/api/files/clear', {
+      method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Storage cleared');
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+
+      // Optionally refresh the page to reflect the results
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error clearing storage:', error);
 
       spinner.style.display = 'none';
       body.classList.remove('blurred');
