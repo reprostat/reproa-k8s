@@ -30,8 +30,8 @@ spec:
         ports:
         - containerPort: 80
 
-      - name: file-api
-        image: reprostat/reproa-k8s_file-api:dev
+      - name: files
+        image: reprostat/reproa-k8s_files:dev
         imagePullPolicy: Always
         resources:
           requests:

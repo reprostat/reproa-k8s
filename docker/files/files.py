@@ -11,8 +11,7 @@ STORAGE_FOLDER.mkdir(parents=True, exist_ok=True)
 
 # Allowed file extensions (optional, can add checks)
 ALLOWED_EXTENSIONS = {'.m', '.xml', # workflow
-                      '.json',
-                      '.txt', '.pdf', '.png', '.jpg', '.gif'} # report
+                      '.nii', '.gz' ,'.json', '.tsv'} # data
 
 # Create Flask app
 app = Flask(__name__)
@@ -50,6 +49,21 @@ def upload_files():
             return jsonify({'message': f'File type not allowed for file: {file.filename}'}), 400
     
     return jsonify({'message': 'Files uploaded successfully', 'files': saved_files}), 200
+
+@app.route('/clear', methods=['DELETE'])
+def clear_storage():
+    try:
+        # Walk through the storage folder and list all files
+        # Delete everything reachable from the storage directory.
+        for root, dirs, files in STORAGE_FOLDER.walk(top_down=False):
+            for name in files:
+                (root / name).unlink()
+            for name in dirs:
+                (root / name).rmdir()
+        return jsonify({'message': f'Storage {str(STORAGE_FOLDER)} is clear'}), 200
+    except Exception as e:
+        return jsonify({'message': f'Unable to clear storage {str(STORAGE_FOLDER)} - {str(e)}'}), 500
+
 
 # Download endpoint
 @app.route('/download/<path:filename>', methods=['GET'])
