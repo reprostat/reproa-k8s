@@ -2,33 +2,42 @@
 Kubernetes deployment of reproa
 
 ## Usage
-### 1. Build file-api
+### 1. Build images
 ```bash
-cd docker/file-api
-docker build -t reprostat/file-api:dev .
-docker push reprostat/file-api:dev
+cd docker
+
+# Frontend
+cd frontend
+docker build -t reprostat/reproa-k8s_frontend:dev .
+docker push reprostat/reproa-k8s_frontend:dev
+
+# File API
+cd ../file-api
+docker build -t reprostat/reproa-k8s_file-api:dev .
+docker push reprostat/reproa-k8s_file-api:dev
+
+# Data processor
+cd ../data-processor
+docker build -t reprostat/reproa-k8s_data-processor:demo .
+docker push reprostat/reproa-k8s_data-processor:demo
 ```
 
 ### 2. Deploy
 ```bash
 cd kubernetes
-kubectl apply -f deployment.yml
+kubectl apply -f deployment.yml && k wait --for=condition=ready pod -l app=file-processing
 ```
 
 #### Expose
 ##### Port-forward
 ```bash
-kubectl port-forward deployment.apps/file-processing-deployment 8080:8000 &
-PID1=$!
-kubectl port-forward deployment.apps/file-processing-deployment 8081:8001 &
-PID2=$!
+kubectl port-forward deployment.apps/file-processing-deployment 8000:80
 ```
 
 ##### Service
 ```bash
 k apply -f service.yml
 ```
-You need to change the hostname in _index.html_ from "_localhost_" to the IP of the service.
 
 ### 3. Access pod
 ```bash
@@ -38,7 +47,5 @@ kubectl exec $POD -c file-api -it -- bash
 
 ### 5. Stop
 ```bash
-kubectl delete -f deployment.yml && k wait --for=delete $POD --timeout=60s
-kill $PID1
-kill $PID2
+kubectl delete -f deployment.yml && k wait --for=delete pod -l app=file-processing --timeout=60s
 ```
