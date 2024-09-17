@@ -18,7 +18,7 @@ def process_files():
     tar_file = wdir.with_suffix('.tar.gz')
     with tarfile.open(tar_file, 'w') as tar: tar.add(wdir.name)
     time.sleep(10)  # Simulate a delay for processing
-    return tar_file
+    return str(tar_file)
 
 @app.route('/process-files', methods=['POST'])
 def trigger_processing():
