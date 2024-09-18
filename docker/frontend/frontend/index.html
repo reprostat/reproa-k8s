@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reproa-k8s</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="spinner" id="spinner"></div>
+
+<h2>Folder Upload</h2>
+<form id="uploadForm" enctype="multipart/form-data">
+  <label for="files">Select folder to upload:</label>
+  <input type="file" name="files[]" id="files" multiple webkitdirectory required>
+  <input type="submit" value="Upload Folder">
+</form>
+
+<hr>
+
+<h2>Uploaded Files</h2>
+<div id="fileList"></div>
+
+<hr>
+
+<div class="button-group-container">
+  <!-- Button to trigger clearing storage -->
+  <button id="clearStorageBtn" class="button-group-style">Clear Storage</button>
+  <!-- Button to trigger data processing -->
+  <button id="processFilesBtn" class="button-group-style">Process Files</button>
+</div>
+
+<!-- Floating brainwave circles -->
+<div>
+    <span class="circle"></span>
+    <span class="circle"></span>
+</div>
+
+<script>
+  const uploadForm = document.getElementById('uploadForm');
+  const spinner = document.getElementById('spinner');
+  const body = document.body;
+
+  uploadForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const formData = new FormData(this);
+
+    // Show spinner and add blur effect
+    spinner.style.display = 'block';
+    body.classList.add('blurred');
+
+    fetch('/api/files/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Files uploaded successfully:', data);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+
+      window.location.reload(); // Reload to show updated file list
+    })
+    .catch(error => {
+      console.error('Error uploading folder:', error);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+    });
+  });
+
+  document.getElementById('clearStorageBtn').addEventListener('click', function() {
+    // Show spinner and add blur effect
+    spinner.style.display = 'block';
+    body.classList.add('blurred');
+
+    // Send a request to trigger file processing
+    fetch('/api/files/clear', {
+      method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Storage cleared');
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+
+      // Optionally refresh the page to reflect the results
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error clearing storage:', error);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+    });
+  });
+
+  document.getElementById('processFilesBtn').addEventListener('click', function() {
+    // Show spinner and add blur effect
+    spinner.style.display = 'block';
+    body.classList.add('blurred');
+
+    // Send a request to trigger file processing
+    fetch('/api/process/process-files', {
+      method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Processing complete:', data);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+
+      // Optionally refresh the page to reflect the results
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error processing files:', error);
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+    });
+  });
+
+  function fetchFiles() {
+    fetch('/api/files/files')
+      .then(response => response.json())
+      .then(files => {
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = ''; // Clear the list
+        if (files.length > 0) {
+          files.forEach(file => {
+            const fileLink = document.createElement('a');
+            fileLink.href = `/api/files/download/${file}`;
+            fileLink.textContent = file;
+            fileList.appendChild(fileLink);
+            fileList.appendChild(document.createElement('br'));
+          });
+        } else {
+          fileList.textContent = 'No files uploaded yet.';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching files:', error);
+      });
+  }
+
+  // Fetch the files when the page loads
+  window.onload = fetchFiles;
+</script>
+
+</body>
+</html>

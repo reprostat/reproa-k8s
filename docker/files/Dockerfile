@@ -1,10 +1,12 @@
+# reprostat/reproa-k8s_files:dev
+
 # Use the official Python image from the Docker Hub
 FROM python:3.12-slim
 
 # Set the working directory inside the container
 WORKDIR /app
 
-COPY . .
+COPY *.* ./
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -16,4 +18,4 @@ RUN mkdir -p storage
 EXPOSE 8000
 
 # Command to run the app
-CMD ["python", "rest-file.py"]
+CMD ["python", "files.py"]

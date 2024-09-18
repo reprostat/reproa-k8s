@@ -1,5 +1,3 @@
-# k apply -f deployment.yml
-# k port-forward deployment.apps/file-processing-deployment 8000:8000 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,13 +14,55 @@ spec:
     spec:
       volumes:
       - name: storage
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: 10Gi
       containers:
-      - name: file-api
-        image: reprostat/file-api:dev
+      - name: frontend
+        image: reprostat/reproa-k8s_frontend:dev
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        ports:
+        - containerPort: 80
+
+      - name: files
+        image: reprostat/reproa-k8s_files:dev
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+            ephemeral-storage: 10Gi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+            ephemeral-storage: 50Gi
         ports:
         - containerPort: 8000
         volumeMounts:
         - mountPath: /app/storage
           name: storage
+
+      - name: data-processor
+        image: reprostat/reproa-k8s_data-processor:demo
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 500m
+            memory: 128Mi
+            ephemeral-storage: 10Gi
+          limits:
+            cpu: 1
+            memory: 1024Mi
+            ephemeral-storage: 50Gi
+        ports:
+        - containerPort: 8001
+        volumeMounts:
+        - mountPath: /app/storage
+          name: storage
+        command: ["python", "processor.py"]

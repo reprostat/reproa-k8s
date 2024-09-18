@@ -91,6 +91,22 @@ a:hover {
     color: #00e6e6;
 }
 
+.button-group-container {
+    text-align: center;
+}
+.button-group-style {
+display: inline-block;
+margin: 0 5px;
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+font-size: 16px;
+background-color: #a3f7ffce;
+}
+.button-group-style:hover {
+background-color: #00e6e6c7;
+}
+
 /* Visuals for the theme */
 body::before {
     content: '';
@@ -143,4 +159,30 @@ body::before {
     100% {
         transform: translateY(0);
     }
+}
+
+/* Animation during upload and processing */
+.blurred {
+    filter: blur(3px);
+    pointer-events: none; /* Prevent interactions while processing */
+}
+
+.spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    margin: -40px 0 0 -40px; /* To center the spinner */
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #00e6e6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
