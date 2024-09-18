@@ -1,35 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: reproa-api-ip
+  namespace: reproa
+spec:
+  selector:
+    app: reproa-api
+  ports:
+    - name: files
+      port: 8000
+    - name: processing
+      port: 8001
+  type: ClusterIP
+---        
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: file-processing-deployment
+  name: reproa-api
+  namespace: reproa
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: file-processing
+      app: reproa-api
   template:
     metadata:
       labels:
-        app: file-processing
+        app: reproa-api
     spec:
       volumes:
       - name: storage
         emptyDir:
           sizeLimit: 10Gi
       containers:
-      - name: frontend
-        image: reprostat/reproa-k8s_frontend:dev
-        imagePullPolicy: Always
-        resources:
-          requests:
-            cpu: 100m
-            memory: 64Mi
-          limits:
-            cpu: 200m
-            memory: 128Mi
-        ports:
-        - containerPort: 80
-
       - name: files
         image: reprostat/reproa-k8s_files:dev
         imagePullPolicy: Always

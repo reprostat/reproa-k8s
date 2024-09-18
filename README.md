@@ -8,29 +8,38 @@ Kubernetes deployment of reproa
 ```
 
 ### 2. Deploy
+#### Deploy
 ```bash
 cd kubernetes
-kubectl apply -f deployment.yml && k wait --for=condition=ready pod -l app=file-processing
+kubectl apply -f namespace.yml
+kubectl apply -f frontend.yml && kubectl apply -f api.yml
+kubectl wait --for=condition=ready -n reproa pod -l app=reproa-frontend --timeout=60s
+kubectl wait --for=condition=ready -n reproa pod -l app=reproa-api --timeout=60s
 ```
 
 #### Expose
 ##### Port-forward
 ```bash
-kubectl port-forward deployment.apps/file-processing-deployment 8000:80
+kubectl port-forward -n reproa deployment.apps/reproa-frontend 8000:80
 ```
 
 ##### Service
 ```bash
-k apply -f service.yml
+kubectl apply -f service.yml
+kubectl wait --for=jsonpath='{.status.loadBalancer.ingress}' -n reproa service/reproa-access
 ```
 
-### 3. Access pod
+### 3. Stop
 ```bash
-POD=$(kubectl get pods -l app=file-processing -o name)
-kubectl exec $POD -c data-processor -it -- bash
+kubectl delete -f frontend.yml && kubectl delete -f api.yml
+kubectl wait --for=delete -n reproa pod -l app=reproa-frontend --timeout=60s
+kubectl wait --for=delete -n reproa pod -l app=reproa-api --timeout=60s
+kubectl delete -f namespace.yml
 ```
 
-### 5. Stop
+## Debug
+### Access data-prcessor
 ```bash
-kubectl delete -f deployment.yml && k wait --for=delete pod -l app=file-processing --timeout=60s
+POD_API=$(kubectl get pods -n reproa -l app=reproa-api -o name)
+kubectl exec -n reproa $POD_API -c data-processor -it -- bash
 ```
