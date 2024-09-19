@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from pathlib import Path
@@ -73,19 +73,31 @@ def download_file(filename):
         file_path = STORAGE_FOLDER / filename
         
         # Use send_from_directory with pathlib's parts
-        return send_from_directory(STORAGE_FOLDER, file_path.relative_to(STORAGE_FOLDER), as_attachment=True)
+        return send_file(str(file_path), as_attachment=True)
     except FileNotFoundError:
         return jsonify({'message': f'File {filename} not found'}), 404
 
-# List files endpoint
-@app.route('/files', methods=['GET'])
-def list_files():
-    try:
-        # Walk through the storage folder and list all files
-        files = [str(path.relative_to(STORAGE_FOLDER)) for path in STORAGE_FOLDER.rglob('*') if path.is_file()]
-        return jsonify(files), 200
-    except Exception as e:
-        return jsonify({'message': f'Unable to scan directory: {str(e)}'}), 500
+# Endpoint to list the storage folder 
+@app.route('/files/', methods=['GET'])
+def list_storage():
+    return get_folder_contents()
+
+# Endpoint to browse the folders
+@app.route('/files/<path:folder_path>', methods=['GET'])
+def get_folder_contents(folder_path=""):
+    full_path = STORAGE_FOLDER / folder_path
+
+    if full_path.exists() and full_path.is_dir():
+        items = []
+        # Iterate through files and folders in the directory
+        for item in full_path.iterdir():
+            if item.is_dir():
+                items.append({"name": item.name, "type": "folder"})
+            else:
+                items.append({"name": item.name, "type": "file"})
+        return jsonify(items)
+    else:
+        return jsonify({"error": f"Directory {folder_path} not found"}), 404
 
 # Start the Flask server
 if __name__ == '__main__':

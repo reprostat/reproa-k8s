@@ -73,24 +73,52 @@ hr {
     margin-bottom: 30px;
 }
 
-#fileList {
-    width: 350px;
-    background-color: #262837;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+/* File browser */
+.file-browser {
+width: 60%;
+margin: 0 auto;
 }
 
-a {
-    color: #a3f7ff;
-    text-decoration: none;
-    font-size: 16px;
+ul {
+list-style-type: none;
+padding: 0;
 }
 
-a:hover {
-    color: #00e6e6;
+li {
+padding: 8px 0;
 }
 
+.folder {
+font-weight: bold;
+cursor: pointer;
+}
+
+.file {
+cursor: pointer;
+color: #007bff;
+}
+
+#breadcrumb {
+margin-bottom: 10px;
+}
+
+.breadcrumb-item {
+display: inline-block;
+cursor: pointer;
+color: #007bff;
+margin-right: 5px;
+}
+
+.breadcrumb-item:after {
+content: ">";
+margin-left: 5px;
+}
+
+.breadcrumb-item:last-child:after {
+content: "";
+}
+
+/* Buttons */
 .button-group-container {
     text-align: center;
 }

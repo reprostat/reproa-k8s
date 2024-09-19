@@ -20,7 +20,13 @@
 <hr>
 
 <h2>Uploaded Files</h2>
-<div id="fileList"></div>
+<div class="file-browser">
+  <!-- Breadcrumb for navigation -->
+  <div id="breadcrumb"></div>
+
+  <!-- File and folder list -->
+  <ul id="file-list"></ul>
+</div>
 
 <hr>
 
@@ -38,6 +44,7 @@
 </div>
 
 <script>
+  let currentPath=''
   const uploadForm = document.getElementById('uploadForm');
   const spinner = document.getElementById('spinner');
   const body = document.body;
@@ -71,6 +78,76 @@
       body.classList.remove('blurred');
     });
   });
+
+  // Function to fetch and display files and folders
+  function fetchFolderContents(path) {
+    fetch(`/api/files/files/${path}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          displayFiles(data);
+        }
+      });
+  }
+
+  // Function to display files and folders in the list
+  function displayFiles(items) {
+    const fileList = document.getElementById('file-list');
+    fileList.innerHTML = '';
+
+    items.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.name;
+      
+      if (item.type === 'folder') {
+        li.classList.add('folder');
+        li.addEventListener('click', () => navigateToFolder(item.name));
+      } else {
+        li.classList.add('file');
+        li.addEventListener('click', () => downloadFile(item.name));
+      }
+
+      fileList.appendChild(li);
+    });
+
+    updateBreadcrumb();
+  }
+
+  // Function to navigate into a folder
+  function navigateToFolder(folderName) {
+    currentPath += (currentPath ? '/' : '') + folderName;
+    fetchFolderContents(currentPath);
+  }
+
+  // Function to go back in the breadcrumb
+  function navigateToPath(pathIndex) {
+    const pathArray = currentPath.split('/');
+    currentPath = pathArray.slice(0, pathIndex + 1).join('/');
+    fetchFolderContents(currentPath);
+  }
+
+  // Function to update breadcrumb navigation
+  function updateBreadcrumb() {
+    const breadcrumb = document.getElementById('breadcrumb');
+    breadcrumb.innerHTML = '';
+
+    const pathArray = currentPath.split('/');
+    pathArray.forEach((dir, index) => {
+      const span = document.createElement('span');
+      span.textContent = dir || 'root';
+      span.classList.add('breadcrumb-item');
+      span.addEventListener('click', () => navigateToPath(index));
+      breadcrumb.appendChild(span);
+    });
+  }
+
+  // Function to download a file
+  function downloadFile(fileName) {
+    const downloadUrl = `/api/files/download/${currentPath ? currentPath + '/' : ''}${fileName}`;
+    window.location.href = downloadUrl;
+  }
 
   document.getElementById('clearStorageBtn').addEventListener('click', function() {
     // Show spinner and add blur effect
@@ -125,32 +202,9 @@
       body.classList.remove('blurred');
     });
   });
+  // Initial load of root folder
+  fetchFolderContents('');
 
-  function fetchFiles() {
-    fetch('/api/files/files')
-      .then(response => response.json())
-      .then(files => {
-        const fileList = document.getElementById('fileList');
-        fileList.innerHTML = ''; // Clear the list
-        if (files.length > 0) {
-          files.forEach(file => {
-            const fileLink = document.createElement('a');
-            fileLink.href = `/api/files/download/${file}`;
-            fileLink.textContent = file;
-            fileList.appendChild(fileLink);
-            fileList.appendChild(document.createElement('br'));
-          });
-        } else {
-          fileList.textContent = 'No files uploaded yet.';
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching files:', error);
-      });
-  }
-
-  // Fetch the files when the page loads
-  window.onload = fetchFiles;
 </script>
 
 </body>
