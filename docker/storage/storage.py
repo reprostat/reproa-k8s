@@ -10,7 +10,8 @@ STORAGE_FOLDER = Path('storage')
 STORAGE_FOLDER.mkdir(parents=True, exist_ok=True)
 
 # Allowed file extensions (optional, can add checks)
-ALLOWED_EXTENSIONS = {'.m', '.xml', # workflow
+ALLOWED_EXTENSIONS = {'', # unspecified (e.g., for README)
+                      '.m', '.xml', # workflow
                       '.nii', '.gz' ,'.json', '.tsv'} # data
 
 # Create Flask app
