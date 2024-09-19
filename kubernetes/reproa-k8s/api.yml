@@ -33,8 +33,8 @@ spec:
         emptyDir:
           sizeLimit: 10Gi
       containers:
-      - name: files
-        image: reprostat/reproa-k8s_files:dev
+      - name: storage-api
+        image: reprostat/reproa-k8s_storage:dev
         imagePullPolicy: Always
         resources:
           requests:
@@ -51,7 +51,7 @@ spec:
         - mountPath: /app/storage
           name: storage
 
-      - name: data-processor
+      - name: data-processor-api
         image: reprostat/reproa-k8s_data-processor:demo
         imagePullPolicy: Always
         resources:

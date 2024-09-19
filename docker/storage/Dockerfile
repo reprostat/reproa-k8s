@@ -1,4 +1,4 @@
-# reprostat/reproa-k8s_files:dev
+# reprostat/reproa-k8s_storage:dev
 
 # Use the official Python image from the Docker Hub
 FROM python:3.12-slim
@@ -18,4 +18,4 @@ RUN mkdir -p storage
 EXPOSE 8000
 
 # Command to run the app
-CMD ["python", "files.py"]
+CMD ["python", "storage.py"]

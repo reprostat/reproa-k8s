@@ -58,7 +58,7 @@
     spinner.style.display = 'block';
     body.classList.add('blurred');
 
-    fetch('/api/files/upload', {
+    fetch('/api/storage/upload', {
       method: 'POST',
       body: formData
     })
@@ -81,7 +81,7 @@
 
   // Function to fetch and display files and folders
   function fetchFolderContents(path) {
-    fetch(`/api/files/files/${path}`)
+    fetch(`/api/storage/files/${path}`)
       .then(response => response.json())
       .then(data => {
         if (data.error) {
@@ -145,7 +145,7 @@
 
   // Function to download a file
   function downloadFile(fileName) {
-    const downloadUrl = `/api/files/download/${currentPath ? currentPath + '/' : ''}${fileName}`;
+    const downloadUrl = `/api/storage/download/${currentPath ? currentPath + '/' : ''}${fileName}`;
     window.location.href = downloadUrl;
   }
 
@@ -155,7 +155,7 @@
     body.classList.add('blurred');
 
     // Send a request to trigger file processing
-    fetch('/api/files/clear', {
+    fetch('/api/storage/clear', {
       method: 'DELETE'
     })
     .then(response => response.json())
@@ -182,7 +182,7 @@
     body.classList.add('blurred');
 
     // Send a request to trigger file processing
-    fetch('/api/process/process-files', {
+    fetch('/api/processor/process-data', {
       method: 'POST'
     })
     .then(response => response.json())

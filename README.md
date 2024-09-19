@@ -20,8 +20,13 @@ Kubernetes deployment of reproa
 ```
 
 ## Debug
-### Access data-prcessor
+### Access containers
 ```bash
+# Frontend
+POD_WEB=$(kubectl get pods -n reproa -l app=reproa-frontend -o name)
+kubectl exec -n reproa $POD_WEB -it -- sh
+
+# Data-processor
 POD_API=$(kubectl get pods -n reproa -l app=reproa-api -o name)
-kubectl exec -n reproa $POD_API -c data-processor -it -- bash
+kubectl exec -n reproa $POD_API -c data-processor-api -it -- bash
 ```

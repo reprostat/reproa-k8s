@@ -13,14 +13,14 @@ chdir(directory_to_watch)
 app = Flask(__name__)
 CORS(app)
 
-def process_files():
+def process_data():
     wdir = list(directory_to_watch.glob('*'))[0]
     tar_file = wdir.with_suffix('.tar.gz')
     with tarfile.open(tar_file, 'w') as tar: tar.add(wdir.name)
     time.sleep(10)  # Simulate a delay for processing
     return str(tar_file)
 
-@app.route('/process-files', methods=['POST'])
+@app.route('/process-data', methods=['POST'])
 def trigger_processing():
     """
     API endpoint to trigger file processing.
@@ -28,7 +28,7 @@ def trigger_processing():
     if not directory_to_watch.exists():
         return jsonify({'message': 'Directory not found!'}), 404
 
-    processed_files = process_files()
+    processed_files = process_data()
     
     if processed_files:
         return jsonify({'message': 'Processing complete', 'files': processed_files}), 200

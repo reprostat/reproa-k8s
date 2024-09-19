@@ -14,9 +14,12 @@ for api in ${to_build[@]}; do
 
     cd $api
     image=$(head Dockerfile -n 1 | grep -oP '(?<=# )[a-z0-9\/\:_-]*')
-    echo "Building and deploying ${image} ..."
+    echo "Building and publishing ${image} ..."
     docker build -t ${image} .
     docker push ${image}
     echo "Done!"
     cd ..
 done
+
+# Clear
+docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
