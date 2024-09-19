@@ -75,8 +75,41 @@ hr {
 
 /* File browser */
 .file-browser {
-width: 60%;
-margin: 0 auto;
+width: 40%;
+margin-bottom: 0px;
+color: #d1e7ff;
+}
+
+#breadcrumb {
+margin-bottom: 10px;
+}
+
+.breadcrumb-item {
+display: inline-block;
+font-weight: bold;
+text-decoration: underline;
+cursor: pointer;
+margin-right: 5px;
+}
+
+    /* Separator */
+.breadcrumb-item:after {
+content: ">";
+margin-left: 5px;
+}
+
+    /* Prefix */
+.breadcrumb-item:first-child {
+text-decoration: none;
+cursor: auto;
+}
+.breadcrumb-item:first-child:after {
+content: ":";
+}
+
+    /* No seperator after the last */
+.breadcrumb-item:last-child:after {
+content: "";
 }
 
 ul {
@@ -95,27 +128,6 @@ cursor: pointer;
 
 .file {
 cursor: pointer;
-color: #007bff;
-}
-
-#breadcrumb {
-margin-bottom: 10px;
-}
-
-.breadcrumb-item {
-display: inline-block;
-cursor: pointer;
-color: #007bff;
-margin-right: 5px;
-}
-
-.breadcrumb-item:after {
-content: ">";
-margin-left: 5px;
-}
-
-.breadcrumb-item:last-child:after {
-content: "";
 }
 
 /* Buttons */

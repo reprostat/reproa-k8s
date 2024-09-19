@@ -24,6 +24,8 @@
   <!-- Breadcrumb for navigation -->
   <div id="breadcrumb"></div>
 
+  <hr style="margin-bottom: 0px;">
+
   <!-- File and folder list -->
   <ul id="file-list"></ul>
 </div>
@@ -133,10 +135,16 @@
     const breadcrumb = document.getElementById('breadcrumb');
     breadcrumb.innerHTML = '';
 
+    // Prefix
+    const span = document.createElement('span');
+    span.textContent = 'Path';
+    span.classList.add('breadcrumb-item');
+    breadcrumb.appendChild(span);
+
     const pathArray = currentPath.split('/');
     pathArray.forEach((dir, index) => {
       const span = document.createElement('span');
-      span.textContent = dir || 'root';
+      span.textContent = dir || 'storage';
       span.classList.add('breadcrumb-item');
       span.addEventListener('click', () => navigateToPath(index));
       breadcrumb.appendChild(span);
