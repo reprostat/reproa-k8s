@@ -1,5 +1,11 @@
-POD_WEB=$(kubectl get pods -n reproa -l app=reproa-frontend -o name)
-kubectl delete -n reproa $POD_WEB
+if [[ -z ${1} ]]; then
+    # Find all folders with Dockerfile
+    to_update=(frontend api)
+else
+    to_update=($@)
+fi
 
-POD_API=$(kubectl get pods -n reproa -l app=reproa-api -o name)
-kubectl delete -n reproa $POD_API
+for pod in ${to_update[@]}; do
+    POD=$(kubectl get pods -n reproa -l app=reproa-${pod} -o name)
+    kubectl delete -n reproa $POD
+done
