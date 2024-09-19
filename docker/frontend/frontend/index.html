@@ -66,7 +66,7 @@
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Files uploaded successfully:', data);
+      console.log(data.message, data.files);
 
       spinner.style.display = 'none';
       body.classList.remove('blurred');

@@ -32,6 +32,7 @@ def upload_files():
 
     # Process each file
     saved_files = []
+    skipped_files = []
     for file in files:
         if Path(file.filename).suffix in ALLOWED_EXTENSIONS:
             # Secure the filename and construct the full file path using pathlib
@@ -46,9 +47,11 @@ def upload_files():
             file.save(file_path)
             saved_files.append(str(file_path.relative_to(STORAGE_FOLDER)))
         else:
-            return jsonify({'message': f'File type not allowed for file: {file.filename}'}), 400
-    
-    return jsonify({'message': 'Files uploaded successfully', 'files': saved_files}), 200
+            skipped_files.append(file.filename)
+    if len(skipped_files):
+        return jsonify({'message': f'File type not allowed for {len(skipped_files)} file(s)', 'files': skipped_files}), 400
+    else:
+        return jsonify({'message': 'Files uploaded successfully', 'files': saved_files}), 200
 
 @app.route('/clear', methods=['DELETE'])
 def clear_storage():
