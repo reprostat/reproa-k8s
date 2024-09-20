@@ -18,7 +18,28 @@ body {
     min-height: 100vh;
     padding: 20px;
     position: relative;
-    overflow: hidden;
+}
+body::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: url('https://www.svgrepo.com/download/39705/brain.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    filter: blur(2px);
+    transform: translateX(-50%) scaleY(-1);
+    z-index: -1;
+}
+
+hr {
+    border: 1px solid #393a50;
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 h2 {
@@ -28,19 +49,29 @@ h2 {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Form */
 form {
     background-color: #262837; /* Card-like dark blue background */
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     width: 350px;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 label {
     font-size: 18px;
     color: #a3f7ff;
     margin-bottom: 10px;
+}
+
+input[type="text"] {
+    margin-bottom: 20px;
+    border: 1px solid #00e6e6;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #1f2235;
+    color: #00e6e6;
 }
 
 input[type="file"] {
@@ -50,27 +81,6 @@ input[type="file"] {
     border-radius: 5px;
     background-color: #1f2235;
     color: #00e6e6;
-}
-
-input[type="submit"] {
-    background-color: #00e6e6;
-    color: #1c1e29;
-    font-size: 18px;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-input[type="submit"]:hover {
-    background-color: #00b3b3; /* Darker shade on hover */
-}
-
-hr {
-    border: 1px solid #393a50;
-    width: 100%;
-    margin-bottom: 30px;
 }
 
 /* File browser */
@@ -130,38 +140,24 @@ cursor: pointer;
 cursor: pointer;
 }
 
-/* Buttons */
-.button-group-container {
+.container {
     text-align: center;
 }
-.button-group-style {
-display: inline-block;
-margin: 0 5px;
-padding: 10px 20px;
-border: none;
-border-radius: 5px;
-font-size: 16px;
-background-color: #a3f7ffce;
-}
-.button-group-style:hover {
-background-color: #00e6e6c7;
+
+/* Button group */
+.button {
+    background-color: #00e6e6;
+    color: #1c1e29;
+    font-size: 18px;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-/* Visuals for the theme */
-body::before {
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    width: 600px;
-    height: 600px;
-    background: url('https://www.svgrepo.com/download/39705/brain.svg');
-    bachttps://www.svgrepo.com/download/39705/brain.svgkground-size: cover;
-    background-repeat: no-repeat;
-    opacity: 0.15;
-    filter: blur(2px);
-    transform: translateX(-50%) scaleY(-1);
-    z-index: -1;
+.button:hover {
+    background-color: #00b3b3; /* Darker shade on hover */
 }
 
 /* Floating animated circles representing brain waves */

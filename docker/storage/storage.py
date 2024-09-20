@@ -19,8 +19,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Upload endpoint - allows folder upload by handling multiple files
-@app.route('/upload', methods=['POST'])
-def upload_files():
+@app.route('/upload/<path:folder_path>', methods=['POST'])
+def upload_files(folder_path=""):
     # Check if files were uploaded
     if 'files[]' not in request.files:
         return jsonify({'message': 'No files part in the request'}), 400
@@ -39,7 +39,7 @@ def upload_files():
             # Secure the filename and construct the full file path using pathlib
             full_filename = Path(file.filename)
             full_filename = full_filename.with_name(secure_filename(full_filename.name))
-            file_path = STORAGE_FOLDER / full_filename
+            file_path = STORAGE_FOLDER / folder_path / full_filename
             
             # Create parent directories if necessary
             file_path.parent.mkdir(parents=True, exist_ok=True)
