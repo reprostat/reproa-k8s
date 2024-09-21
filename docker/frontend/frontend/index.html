@@ -13,7 +13,7 @@
 <h2>Project</h2>
 <form id="createProject" enctype="multipart/form-data">
   <label for="project">Name of the project</label>
-  <input type="text" name="project" id="project" style="display: inline-block;">
+  <input type="text" name="projectTxt" style="display: inline-block;" required>
   <input type="submit" class="button" value="Create">
 </form>
 
@@ -22,8 +22,8 @@
 <h2>Data</h2>
 <form id="uploadForm" enctype="multipart/form-data">
   <label for="files">Select folder to upload:</label>
-  <input type="file" name="files[]" id="files" style="display: inline-block;" multiple webkitdirectory required>
-  <input type="submit" class="button" value="Upload Folder" disabled>
+  <input type="file" name="files[]" id="files" multiple webkitdirectory required>
+  <input type="submit" name="uploadBtn" class="button" value="Upload Folder" disabled>
 </form>
 
 <hr>
@@ -48,27 +48,37 @@
   <button id="processFilesBtn" class="button" style="display: inline-block;" disabled>Process Files</button>
 </div>
 
-
 <!-- Floating brainwave circles -->
 <div>
     <span class="circle"></span>
     <span class="circle"></span>
 </div>
 
+<div id="statusBar" class="status">
+  <p style="font-size: 18px;">...</p>
+</div>
+
 <script>
-  let project = 'test'
-  let currentPath = ''
-  const createProject = document.getElementById('createProject');
-  const uploadForm = document.getElementById('uploadForm');
+  let currentProject = 'test';
+  let currentPath = '';
+  const createProject = document.forms['createProject'];
+  const uploadForm = document.forms['uploadForm'];
+  const statusBar = document.getElementById('statusBar');
+  const statusTxt = statusBar.getElementsByTagName('p')[0]
+  const clearStorageBtn = document.getElementById('clearStorageBtn');
+  const processFilesBtn = document.getElementById('processFilesBtn');
   const spinner = document.getElementById('spinner');
   const body = document.body;
 
   createProject.addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the default form submission
 
-    const formData = new FormData(this);
+    currentProject = this.elements['projectTxt'].value;
 
-    project = formData.project
+    uploadForm.elements['uploadBtn'].disabled = false;
+
+    statusBar.className = 'status info';
+    statusTxt.textContent = `Current project: ${currentProject}`;
   });
   
   uploadForm.addEventListener('submit', function(event) {
@@ -80,18 +90,24 @@
     spinner.style.display = 'block';
     body.classList.add('blurred');
 
-    fetch(`/api/storage/upload/${project}`, {
+    fetch(`/api/storage/upload/${currentProject}`, {
       method: 'POST',
       body: formData
     })
     .then(response => response.json())
-    .then(data => {
+    .then(data => {      
       console.log(data.message, data.files);
 
       spinner.style.display = 'none';
       body.classList.remove('blurred');
 
       window.location.reload(); // Reload to show updated file list
+      
+      clearStorageBtn.disabled = false;
+      processFilesBtn.disabled = false;
+
+      statusBar.className = 'status success';
+      statusTxt.textContent = data.message;
     })
     .catch(error => {
       console.error('Error uploading folder:', error);
@@ -177,7 +193,7 @@
     window.location.href = downloadUrl;
   }
 
-  document.getElementById('clearStorageBtn').addEventListener('click', function() {
+  clearStorageBtn.addEventListener('click', function() {
     // Show spinner and add blur effect
     spinner.style.display = 'block';
     body.classList.add('blurred');
@@ -195,6 +211,9 @@
 
       // Optionally refresh the page to reflect the results
       window.location.reload();
+
+      clearStorageBtn.disabled = true;
+      processFilesBtn.disabled = true;
     })
     .catch(error => {
       console.error('Error clearing storage:', error);
@@ -204,13 +223,13 @@
     });
   });
 
-  document.getElementById('processFilesBtn').addEventListener('click', function() {
+  processFilesBtn.addEventListener('click', function() {
     // Show spinner and add blur effect
     spinner.style.display = 'block';
     body.classList.add('blurred');
 
     // Send a request to trigger file processing
-    fetch(`/api/processor/process-data/${project}`, {
+    fetch(`/api/processor/process-data/${currentProject}`, {
       method: 'POST'
     })
     .then(response => response.json())

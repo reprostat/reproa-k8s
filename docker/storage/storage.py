@@ -52,7 +52,7 @@ def upload_files(folder_path=""):
     if len(skipped_files):
         return jsonify({'message': f'File type not allowed for {len(skipped_files)} file(s)', 'files': skipped_files}), 400
     else:
-        return jsonify({'message': 'Files uploaded successfully', 'files': saved_files}), 200
+        return jsonify({'message': f'{len(saved_files)} file(s) uploaded successfully', 'files': saved_files}), 200
 
 @app.route('/clear', methods=['DELETE'])
 def clear_storage():
