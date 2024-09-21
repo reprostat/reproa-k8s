@@ -9,7 +9,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: rgb(28, 30, 41); /* Dark background for a modern neuroimaging feel */
+    background-color: rgb(28, 30, 41);
+    /* Dark background for a modern neuroimaging feel */
     color: rgb(240, 240, 240);
     display: flex;
     flex-direction: column;
@@ -19,6 +20,7 @@ body {
     padding: 20px;
     position: relative;
 }
+
 body::before {
     content: '';
     position: absolute;
@@ -38,30 +40,36 @@ body::before {
 hr {
     border: 1px solid rgb(57, 58, 80);
     width: 100%;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 h2 {
-    margin-bottom: 15px;
+    margin: 15px;
     font-size: 28px;
-    color: rgb(0, 230, 230); /* Bright color, reminiscent of MRI or fMRI scans */
+    color: rgb(0, 230, 230);
+    /* Bright color, reminiscent of MRI or fMRI scans */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Generic controls */
 .container {
     display: flex;
-    justify-content: center;
-    margin-bottom: 15px;
+    margin: 15px;
     text-align: center;
+}
+.container.hozontal {
+    flex-flow: row;
+}
+.container.vertical {
+    flex-flow: column;
 }
 
 .button {
     background-color: rgb(0, 230, 230);
     color: rgb(28, 30, 41);
     font-size: 18px;
-    margin: 15px;
+    margin: 0px 15px 0px;
     border: none;
     padding: 10px;
     border-radius: 5px;
@@ -70,7 +78,8 @@ h2 {
 }
 
 .button:hover {
-    background-color: rgb(0, 179, 179); /* Darker shade on hover */
+    background-color: rgb(0, 179, 179);
+    /* Darker shade on hover */
 }
 
 .button[disabled] {
@@ -79,43 +88,53 @@ h2 {
 
 /* Status */
 .status {
-position:sticky;
-bottom: 0;
+    position: sticky;
+    bottom: 0;
+    left: 25vw;
+    width: auto;
+    min-width: 25vw;
 
-padding: 4px 12px;
-background-color: rgb(192, 192, 192);
-color:rgb(64, 64, 64);
-border-left: 6px solid rgb(64, 64, 64);
+    padding: 4px 12px;
+    background-color: rgb(192, 192, 192);
+    color: rgb(64, 64, 64);
+    border-left: 6px solid rgb(64, 64, 64);
+}
+
+.status p {
+    font-size: 18px
 }
 
 .status.success {
-background-color: rgb(128, 255, 128);
-border-left: 6px solid rgb(0, 128, 0);
+    background-color: rgb(128, 255, 128);
+    border-left: 6px solid rgb(0, 128, 0);
 }
 
 .status.info {
-background-color: rgb(0, 192, 255);
-border-left: 6px solid rgb(0, 32, 255);
+    background-color: rgb(0, 192, 255);
+    border-left: 6px solid rgb(0, 32, 255);
 }
 
 /* Form */
 form {
-    background-color: #262837; /* Card-like dark blue background */
-    padding: 20px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    background-color: rgba(38, 40, 55, 0.6);
+    /* Card-like dark blue background */
+    padding: 10px;
     border-radius: 10px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     width: 350px;
-    margin-bottom: 15px;
 }
 
 label {
     font-size: 18px;
     color: #a3f7ff;
-    margin-bottom: 10px;
 }
 
 input[type="text"] {
-    margin-bottom: 20px;
     border: 1px solid #00e6e6;
     padding: 10px;
     border-radius: 5px;
@@ -124,7 +143,6 @@ input[type="text"] {
 }
 
 input[type="file"] {
-    margin-bottom: 20px;
     border: 1px solid #00e6e6;
     padding: 10px;
     border-radius: 5px;
@@ -134,68 +152,77 @@ input[type="file"] {
 
 /* File browser */
 .file-browser {
-width: 40%;
-margin-bottom: 0px;
-color: #d1e7ff;
+    background-color: rgba(38, 40, 55, 0.6);
+    /* Card-like dark blue background */
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    margin-bottom: 0px;
+
+    color: #d1e7ff;
+    text-align: left;
 }
 
 #breadcrumb {
-margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .breadcrumb-item {
-display: inline-block;
-font-weight: bold;
-text-decoration: underline;
-cursor: pointer;
-margin-right: 5px;
+    display: inline-block;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-right: 5px;
 }
 
-    /* Separator */
+/* Separator */
 .breadcrumb-item:after {
-content: ">";
-margin-left: 5px;
+    content: ">";
+    margin-left: 5px;
 }
 
-    /* Prefix */
+/* Prefix */
 .breadcrumb-item:first-child {
-text-decoration: none;
-cursor: auto;
-}
-.breadcrumb-item:first-child:after {
-content: ":";
+    text-decoration: none;
+    cursor: auto;
 }
 
-    /* No seperator after the last */
+.breadcrumb-item:first-child:after {
+    content: ":";
+}
+
+/* No seperator after the last */
 .breadcrumb-item:last-child:after {
-content: "";
+    content: "";
 }
 
 ul {
-list-style-type: none;
-padding: 0;
+    list-style-type: none;
+    padding: 0;
 }
 
 li {
-padding: 8px 0;
+    padding: 8px 0;
 }
 
 .folder {
-font-weight: bold;
-cursor: pointer;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .file {
-cursor: pointer;
+    cursor: pointer;
 }
 
 /* Floating animated circles representing brain waves */
 .circle {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(0,230,230,0.1), rgba(163,247,255,0)); /* Increased opacity */
+    background: radial-gradient(circle, rgba(0, 230, 230, 0.1), rgba(163, 247, 255, 0));
+    /* Increased opacity */
     animation: float 6s ease-in-out infinite;
-    z-index: 0; /* Ensure circles are visible behind content */
+    z-index: 0;
+    /* Ensure circles are visible behind content */
 }
 
 .circle:nth-child(1) {
@@ -218,9 +245,11 @@ cursor: pointer;
     0% {
         transform: translateY(0);
     }
+
     50% {
         transform: translateY(-30px);
     }
+
     100% {
         transform: translateY(0);
     }
@@ -229,7 +258,8 @@ cursor: pointer;
 /* Animation during upload and processing */
 .blurred {
     filter: blur(3px);
-    pointer-events: none; /* Prevent interactions while processing */
+    pointer-events: none;
+    /* Prevent interactions while processing */
 }
 
 .spinner {
@@ -239,7 +269,8 @@ cursor: pointer;
     left: 50%;
     width: 80px;
     height: 80px;
-    margin: -40px 0 0 -40px; /* To center the spinner */
+    margin: -40px 0 0 -40px;
+    /* To center the spinner */
     border: 8px solid #f3f3f3;
     border-top: 8px solid #00e6e6;
     border-radius: 50%;
@@ -248,6 +279,11 @@ cursor: pointer;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

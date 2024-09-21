@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-from flask_cors import CORS
 from os import chdir
 from pathlib import Path
 import tarfile
@@ -11,7 +10,6 @@ chdir(storage_root)
 
 # Set up the Flask app
 app = Flask(__name__)
-CORS(app)
 
 def process_data(project_dir=""):
     wdir = storage_root / project_dir

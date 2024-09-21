@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from pathlib import Path
 
@@ -16,7 +15,6 @@ ALLOWED_EXTENSIONS = {'', # unspecified (e.g., for README)
 
 # Create Flask app
 app = Flask(__name__)
-CORS(app)
 
 # Upload endpoint - allows folder upload by handling multiple files
 @app.route('/upload/<path:folder_path>', methods=['POST'])
@@ -54,19 +52,20 @@ def upload_files(folder_path=""):
     else:
         return jsonify({'message': f'{len(saved_files)} file(s) uploaded successfully', 'files': saved_files}), 200
 
-@app.route('/clear', methods=['DELETE'])
-def clear_storage():
+@app.route('/clear/<path:folder_path>', methods=['DELETE'])
+def clear_storage(folder_path=""):
     try:
         # Walk through the storage folder and list all files
         # Delete everything reachable from the storage directory.
-        for root, dirs, files in STORAGE_FOLDER.walk(top_down=False):
+        for root, dirs, files in (STORAGE_FOLDER / folder_path).walk(top_down=False):
             for name in files:
                 (root / name).unlink()
             for name in dirs:
                 (root / name).rmdir()
-        return jsonify({'message': f'Storage {str(STORAGE_FOLDER)} is clear'}), 200
+        if folder_path: (STORAGE_FOLDER / folder_path).rmdir()
+        return jsonify({'message': f'Project {str(folder_path)} is clear'}), 200
     except Exception as e:
-        return jsonify({'message': f'Unable to clear storage {str(STORAGE_FOLDER)} - {str(e)}'}), 500
+        return jsonify({'message': f'Unable to clear project {str(folder_path)} - {str(e)}'}), 500
 
 
 # Download endpoint

@@ -10,51 +10,55 @@
 
 <div class="spinner" id="spinner"></div>
 
-<h2>Project</h2>
-<form id="createProject" class="container" style="flex-flow: row wrap;" enctype="multipart/form-data">
-  <label for="project">Name of the project</label>
-  <input type="text" name="projectTxt" required>
-</form>
+<section class="container vertical">
+  <h2>Project</h2>
+  <form id="createProject" enctype="multipart/form-data">
+    <label for="project">Enter the name of the project</label>
+    <input type="text" name="projectTxt" required>
+  </form>
+</section>
 
 <hr>
 
-<section class="container">
-  <div style="margin: 0px 15px 0px;">
+<section class="container horizontal">
+  <section class="container vertical">
     <h2>Workflow</h2>
     <form id="uploadWorkflowForm" enctype="multipart/form-data">
-      <label for="files">Select folder to upload:</label>
+      <label for="files">Select folder to upload</label>
       <input type="file" name="files[]" id="files" multiple webkitdirectory required>
       <input type="submit" name="uploadBtn" class="button" value="Upload Folder" disabled>
     </form>
-  </div>
-  <div style="margin: 0px 15px 0px;">
+  </section>
+  <section class="container vertical">
     <h2>Data</h2>
     <form id="uploadDataForm" enctype="multipart/form-data">
-      <label for="files">Select folder to upload:</label>
+      <label for="files">Select folder to upload</label>
       <input type="file" name="files[]" id="files" multiple webkitdirectory required>
       <input type="submit" name="uploadBtn" class="button" value="Upload Folder" disabled>
     </form>
+  </section>
+</section>
+
+<hr>
+
+<section class="container vertical">
+  <h2>Uploaded Files</h2>
+  <div class="file-browser">
+    <!-- Breadcrumb for navigation -->
+    <div id="breadcrumb"></div>
+
+    <hr style="margin-bottom: 0px;">
+
+    <!-- File and folder list -->
+    <ul id="file-list"></ul>
   </div>
 </section>
 
 <hr>
 
-<h2>Uploaded Files</h2>
-<div class="file-browser">
-  <!-- Breadcrumb for navigation -->
-  <div id="breadcrumb"></div>
-
-  <hr style="margin-bottom: 0px;">
-
-  <!-- File and folder list -->
-  <ul id="file-list"></ul>
-</div>
-
-<hr>
-
-<section class="container">
+<section class="container horizontal">
   <!-- Button to trigger clearing storage -->
-  <button id="clearStorageBtn" class="button" style="margin-top: 0px;" disabled>Clear Storage</button>
+  <button id="clearProjectBtn" class="button" style="margin-top: 0px;" disabled>Clear Project</button>
   <!-- Button to trigger data processing -->
   <button id="processFilesBtn" class="button" style="margin-top: 0px;" disabled>Process Files</button>
 </section>
@@ -66,7 +70,7 @@
 </div>
 
 <div id="statusBar" class="status">
-  <p style="font-size: 18px;">...</p>
+  <p><strong>Status</strong> ...</p>
 </div>
 
 <script>
@@ -76,7 +80,7 @@
   const uploadDataForm = document.forms['uploadDataForm'];
   const statusBar = document.getElementById('statusBar');
   const statusTxt = statusBar.getElementsByTagName('p')[0]
-  const clearStorageBtn = document.getElementById('clearStorageBtn');
+  const clearProjectBtn = document.getElementById('clearProjectBtn');
   const processFilesBtn = document.getElementById('processFilesBtn');
   const spinner = document.getElementById('spinner');
   const body = document.body;
@@ -120,7 +124,7 @@
 
       window.location.reload(); // Reload to show updated file list
 
-      clearStorageBtn.disabled = false;
+      clearProjectBtn.disabled = false;
       processFilesBtn.disabled = false;
 
       statusBar.className = 'status success';
@@ -210,13 +214,13 @@
     window.location.href = downloadUrl;
   }
 
-  clearStorageBtn.addEventListener('click', function() {
+  clearProjectBtn.addEventListener('click', function() {
     // Show spinner and add blur effect
     spinner.style.display = 'block';
     body.classList.add('blurred');
 
     // Send a request to trigger file processing
-    fetch('/api/storage/clear', {
+    fetch(`/api/storage/clear/${currentProject}`, {
       method: 'DELETE'
     })
     .then(response => response.json())
@@ -229,7 +233,7 @@
       // Optionally refresh the page to reflect the results
       window.location.reload();
 
-      clearStorageBtn.disabled = true;
+      clearProjectBtn.disabled = true;
       processFilesBtn.disabled = true;
     })
     .catch(error => {
