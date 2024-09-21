@@ -11,20 +11,31 @@
 <div class="spinner" id="spinner"></div>
 
 <h2>Project</h2>
-<form id="createProject" enctype="multipart/form-data">
+<form id="createProject" class="container" style="flex-flow: row wrap;" enctype="multipart/form-data">
   <label for="project">Name of the project</label>
-  <input type="text" name="projectTxt" style="display: inline-block;" required>
-  <input type="submit" class="button" value="Create">
+  <input type="text" name="projectTxt" required>
 </form>
 
 <hr>
 
-<h2>Data</h2>
-<form id="uploadForm" enctype="multipart/form-data">
-  <label for="files">Select folder to upload:</label>
-  <input type="file" name="files[]" id="files" multiple webkitdirectory required>
-  <input type="submit" name="uploadBtn" class="button" value="Upload Folder" disabled>
-</form>
+<section class="container">
+  <div style="margin: 0px 15px 0px;">
+    <h2>Workflow</h2>
+    <form id="uploadWorkflowForm" enctype="multipart/form-data">
+      <label for="files">Select folder to upload:</label>
+      <input type="file" name="files[]" id="files" multiple webkitdirectory required>
+      <input type="submit" name="uploadBtn" class="button" value="Upload Folder" disabled>
+    </form>
+  </div>
+  <div style="margin: 0px 15px 0px;">
+    <h2>Data</h2>
+    <form id="uploadDataForm" enctype="multipart/form-data">
+      <label for="files">Select folder to upload:</label>
+      <input type="file" name="files[]" id="files" multiple webkitdirectory required>
+      <input type="submit" name="uploadBtn" class="button" value="Upload Folder" disabled>
+    </form>
+  </div>
+</section>
 
 <hr>
 
@@ -41,12 +52,12 @@
 
 <hr>
 
-<div class="container">
+<section class="container">
   <!-- Button to trigger clearing storage -->
-  <button id="clearStorageBtn" class="button" style="display: inline-block;" disabled>Clear Storage</button>
+  <button id="clearStorageBtn" class="button" style="margin-top: 0px;" disabled>Clear Storage</button>
   <!-- Button to trigger data processing -->
-  <button id="processFilesBtn" class="button" style="display: inline-block;" disabled>Process Files</button>
-</div>
+  <button id="processFilesBtn" class="button" style="margin-top: 0px;" disabled>Process Files</button>
+</section>
 
 <!-- Floating brainwave circles -->
 <div>
@@ -61,8 +72,8 @@
 <script>
   let currentProject = 'test';
   let currentPath = '';
-  const createProject = document.forms['createProject'];
-  const uploadForm = document.forms['uploadForm'];
+  const uploadWorkflowForm = document.forms['uploadWorkflowForm'];
+  const uploadDataForm = document.forms['uploadDataForm'];
   const statusBar = document.getElementById('statusBar');
   const statusTxt = statusBar.getElementsByTagName('p')[0]
   const clearStorageBtn = document.getElementById('clearStorageBtn');
@@ -70,19 +81,25 @@
   const spinner = document.getElementById('spinner');
   const body = document.body;
 
-  createProject.addEventListener('submit', function(event) {
+  document.forms['createProject'].addEventListener('submit', event => {
     event.preventDefault(); // Prevent the default form submission
 
-    currentProject = this.elements['projectTxt'].value;
+    currentProject = event.currentTarget.projectTxt.value;
 
-    uploadForm.elements['uploadBtn'].disabled = false;
+    uploadWorkflowForm.elements['uploadBtn'].disabled = false;
+    uploadDataForm.elements['uploadBtn'].disabled = false;
 
     statusBar.className = 'status info';
     statusTxt.textContent = `Current project: ${currentProject}`;
   });
   
-  uploadForm.addEventListener('submit', function(event) {
+  uploadWorkflowForm.addEventListener('submit', uploadFolder, false)
+  uploadDataForm.addEventListener('submit', uploadFolder, false)
+
+  function uploadFolder(event) {
     event.preventDefault(); // Prevent the default form submission
+
+    let type = /(?<=upload).*(?=Form)/.exec(event.currentTarget.id)
 
     const formData = new FormData(this);
 
@@ -90,7 +107,7 @@
     spinner.style.display = 'block';
     body.classList.add('blurred');
 
-    fetch(`/api/storage/upload/${currentProject}`, {
+    fetch(`/api/storage/upload/${currentProject}/${type}`, {
       method: 'POST',
       body: formData
     })
@@ -102,12 +119,12 @@
       body.classList.remove('blurred');
 
       window.location.reload(); // Reload to show updated file list
-      
+
       clearStorageBtn.disabled = false;
       processFilesBtn.disabled = false;
 
       statusBar.className = 'status success';
-      statusTxt.textContent = data.message;
+      statusTxt.textContent = `${type}: ${data.message}`;
     })
     .catch(error => {
       console.error('Error uploading folder:', error);
@@ -115,7 +132,7 @@
       spinner.style.display = 'none';
       body.classList.remove('blurred');
     });
-  });
+  };
 
   // Function to fetch and display files and folders
   function fetchFolderContents(path) {

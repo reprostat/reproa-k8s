@@ -39,7 +39,7 @@ def upload_files(folder_path=""):
             # Secure the filename and construct the full file path using pathlib
             full_filename = Path(file.filename)
             full_filename = full_filename.with_name(secure_filename(full_filename.name))
-            file_path = STORAGE_FOLDER / folder_path / full_filename
+            file_path = STORAGE_FOLDER / folder_path / Path(*full_filename.parts[1:])
             
             # Create parent directories if necessary
             file_path.parent.mkdir(parents=True, exist_ok=True)
