@@ -24,15 +24,15 @@ def trigger_processing(folder_path=""):
     """
     API endpoint to trigger file processing.
     """
-    if not storage_root.exists():
-        return jsonify({'message': 'Directory not found!'}), 404
+    if not (storage_root / folder_path).exists():
+        return jsonify({'message': f'Project "{folder_path}" not found!'}), 404
 
-    processed_files = process_data(folder_path)
+    result_file = process_data(folder_path)
     
-    if processed_files:
-        return jsonify({'message': 'Processing complete', 'files': processed_files}), 200
+    if result_file:
+        return jsonify({'message': 'Processing complete.', 'file': result_file[len(str(storage_root))+1:]}), 200
     else:
-        return jsonify({'message': 'No files to process'}), 200
+        return jsonify({'message': 'No files to process!'}), 200
 
 # Start the Flask app
 if __name__ == "__main__":
