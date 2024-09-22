@@ -1,7 +1,7 @@
 class StatusBar {
     constructor(initialType, initialMessage) {
-        if (sessionStorage.getItem('statusBar')) {
-            let sb = JSON.parse(sessionStorage.getItem('statusBar'));
+        if (sessionStorage.getItem("statusBar")) {
+            let sb = JSON.parse(sessionStorage.getItem("statusBar"));
             initialType = sb.type;
             initialMessage = sb.message;
         }          
@@ -20,8 +20,9 @@ class StatusBar {
 
     message(type, message) {
         this.statusBar.className = `status ${type}`;
+        if (!type) { type = "Status" }
         this.statusTxt.innerHTML = `<strong>${type}</strong> - ${message}`;
-        sessionStorage.setItem('statusBar',JSON.stringify({type: type, message: message}));
+        sessionStorage.setItem("statusBar",JSON.stringify({type: type, message: message}));
       }
       
 }
