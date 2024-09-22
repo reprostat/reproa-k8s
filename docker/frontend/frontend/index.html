@@ -70,31 +70,47 @@
 </div>
 
 <div id="statusBar" class="status">
-  <p><strong>Status</strong> ...</p>
+  <p><strong>Status</strong> - No project defined</p>
 </div>
 
 <script>
-  let currentProject = 'test';
-  let currentPath = '';
-  const uploadWorkflowForm = document.forms['uploadWorkflowForm'];
-  const uploadDataForm = document.forms['uploadDataForm'];
+  const body = document.body;
   const statusBar = document.getElementById('statusBar');
   const statusTxt = statusBar.getElementsByTagName('p')[0]
+  const uploadWorkflowForm = document.forms['uploadWorkflowForm'];
+  const uploadDataForm = document.forms['uploadDataForm'];
   const clearProjectBtn = document.getElementById('clearProjectBtn');
   const processFilesBtn = document.getElementById('processFilesBtn');
   const spinner = document.getElementById('spinner');
-  const body = document.body;
+
+  // Sets or reloads variables
+  let currentPath = '';
+  let currentProject = '';
+  if (sessionStorage.getItem('currentProject')){
+    currentProject = sessionStorage.getItem('currentProject');
+  }
+  if (sessionStorage.getItem('statusBar')) {
+    let sb = JSON.parse(sessionStorage.getItem('statusBar'));
+    statusMessage(sb.type, sb.message)
+  }
+
+  function statusMessage(type, message) {
+    statusBar.className = `status ${type}`;
+    statusTxt.innerHTML = `<strong>${type}</strong> - ${message}`;
+    sessionStorage.setItem('statusBar',JSON.stringify({type: type, message: message}))
+  }
 
   document.forms['createProject'].addEventListener('submit', event => {
     event.preventDefault(); // Prevent the default form submission
 
     currentProject = event.currentTarget.projectTxt.value;
+    // Save if cache
+    sessionStorage.setItem('currentProject',currentProject);
 
     uploadWorkflowForm.elements['uploadBtn'].disabled = false;
     uploadDataForm.elements['uploadBtn'].disabled = false;
 
-    statusBar.className = 'status info';
-    statusTxt.textContent = `Current project: ${currentProject}`;
+    statusMessage('info',`Current project: ${currentProject}`);
   });
   
   uploadWorkflowForm.addEventListener('submit', uploadFolder, false)
@@ -127,8 +143,7 @@
       clearProjectBtn.disabled = false;
       processFilesBtn.disabled = false;
 
-      statusBar.className = 'status success';
-      statusTxt.textContent = `${type}: ${data.message}`;
+      statusMessage('success', `${type}: ${data.message}`);
     })
     .catch(error => {
       console.error('Error uploading folder:', error);
@@ -153,6 +168,11 @@
 
   // Function to display files and folders in the list
   function displayFiles(items) {
+    if (items & currentProject) {
+      clearProjectBtn.disabled = false;
+      processFilesBtn.disabled = false;
+    }
+
     const fileList = document.getElementById('file-list');
     fileList.innerHTML = '';
 
@@ -184,6 +204,7 @@
   function navigateToPath(pathIndex) {
     const pathArray = currentPath.split('/');
     currentPath = pathArray.slice(0, pathIndex + 1).join('/');
+    sessionStorage.setItem('currentPath',currentPath);
     fetchFolderContents(currentPath);
   }
 
@@ -225,7 +246,7 @@
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Storage cleared');
+      statusMessage('success','Storage cleared')
 
       spinner.style.display = 'none';
       body.classList.remove('blurred');
@@ -234,7 +255,7 @@
       window.location.reload();
 
       clearProjectBtn.disabled = true;
-      processFilesBtn.disabled = true;
+      processFilesBtn.disabled = true;      
     })
     .catch(error => {
       console.error('Error clearing storage:', error);
@@ -255,7 +276,7 @@
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Processing complete:', data);
+      statusMessage('success',`${data.message} Results are available at ${data.file}`)
 
       spinner.style.display = 'none';
       body.classList.remove('blurred');
