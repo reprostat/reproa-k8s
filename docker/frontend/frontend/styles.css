@@ -86,34 +86,6 @@ h2 {
     background-color: rgb(128, 128, 128);
 }
 
-/* Status */
-.status {
-    position: sticky;
-    bottom: 0;
-    left: 25vw;
-    width: auto;
-    min-width: 25vw;
-
-    padding: 4px 12px;
-    background-color: rgb(192, 192, 192);
-    color: rgb(64, 64, 64);
-    border-left: 6px solid rgb(64, 64, 64);
-}
-
-.status p {
-    font-size: 18px
-}
-
-.status.success {
-    background-color: rgb(128, 255, 128);
-    border-left: 6px solid rgb(0, 128, 0);
-}
-
-.status.info {
-    background-color: rgb(0, 192, 255);
-    border-left: 6px solid rgb(0, 32, 255);
-}
-
 /* Form */
 form {
     display: flex;

@@ -1,6 +1,7 @@
+import { StatusBar } from "./elements/statusbar.js"
+const statusBar = new StatusBar(undefined, "No project specified")
+
 const body = document.body;
-const statusBar = document.getElementById('statusBar');
-const statusTxt = statusBar.getElementsByTagName('p')[0]
 const uploadWorkflowForm = document.forms['uploadWorkflowForm'];
 const uploadDataForm = document.forms['uploadDataForm'];
 const clearProjectBtn = document.getElementById('clearProjectBtn');
@@ -13,16 +14,6 @@ let currentProject = '';
 if (sessionStorage.getItem('currentProject')){
   currentProject = sessionStorage.getItem('currentProject');
 }
-if (sessionStorage.getItem('statusBar')) {
-  let sb = JSON.parse(sessionStorage.getItem('statusBar'));
-  statusMessage(sb.type, sb.message)
-}
-
-function statusMessage(type, message) {
-  statusBar.className = `status ${type}`;
-  statusTxt.innerHTML = `<strong>${type}</strong> - ${message}`;
-  sessionStorage.setItem('statusBar',JSON.stringify({type: type, message: message}))
-}
 
 document.forms['createProject'].addEventListener('submit', event => {
   event.preventDefault(); // Prevent the default form submission
@@ -34,7 +25,7 @@ document.forms['createProject'].addEventListener('submit', event => {
   uploadWorkflowForm.elements['uploadBtn'].disabled = false;
   uploadDataForm.elements['uploadBtn'].disabled = false;
 
-  statusMessage('info',`Current project: ${currentProject}`);
+  statusBar.message('info',`Current project: ${currentProject}`);
 });
 
 uploadWorkflowForm.addEventListener('submit', uploadFolder, false)
@@ -67,7 +58,7 @@ function uploadFolder(event) {
     clearProjectBtn.disabled = false;
     processFilesBtn.disabled = false;
 
-    statusMessage('success', `${type}: ${data.message}`);
+    statusBar.message('success', `${type}: ${data.message}`);
   })
   .catch(error => {
     console.error('Error uploading folder:', error);
@@ -170,7 +161,7 @@ clearProjectBtn.addEventListener('click', function() {
   })
   .then(response => response.json())
   .then(data => {
-    statusMessage('success',data.message)
+    statusBar.message('success',data.message)
 
     spinner.style.display = 'none';
     body.classList.remove('blurred');
@@ -200,7 +191,7 @@ processFilesBtn.addEventListener('click', function() {
   })
   .then(response => response.json())
   .then(data => {
-    statusMessage('success',`${data.message} Results are available at ${data.file}`)
+    statusBar.message('success',`${data.message} Results are available at ${data.file}`)
 
     spinner.style.display = 'none';
     body.classList.remove('blurred');
