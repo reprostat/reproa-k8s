@@ -10,7 +10,7 @@ export class StatusBar extends HTMLDivElement {
             initialMessage = sb.message;
         }          
 
-        this.message(initialType, initialMessage);
+        this.setStatus(initialType, initialMessage);
     }
 
     setStatus(type, message) {
