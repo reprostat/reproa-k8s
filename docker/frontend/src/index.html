@@ -5,19 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>reproa-k8s</title>
     <link rel="stylesheet" href="main.css">
+    <script src="elements/form.js" type="module" defer></script>
     <script src="elements/statusbar.js" type="module" defer></script>
 </head>
 <body>
-
 <div class="spinner" id="spinner"></div>
 
-<section class="container vertical">
-  <h2>Project</h2>
-  <form id="createProject" enctype="multipart/form-data">
-    <label for="projectTxt">Enter the name of the project</label>
-    <input type="text" name="projectTxt" required>
-  </form>
-</section>
+<text-form id="projectForm" title="Project" prompts='["Enter the name of the project"]' flow="vertical"></text-form>
 
 <hr>
 

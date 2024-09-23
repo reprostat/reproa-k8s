@@ -1,6 +1,7 @@
 const statusBar = document.getElementsByTagName('status-bar')[0];
 
 const body = document.body;
+const projectForm = document.getElementById('projectForm')
 const uploadWorkflowForm = document.forms['uploadWorkflowForm'];
 const uploadDataForm = document.forms['uploadDataForm'];
 const clearProjectBtn = document.getElementById('clearProjectBtn');
@@ -12,12 +13,13 @@ let currentPath = '';
 let currentProject = '';
 if (sessionStorage.getItem('currentProject')){
   currentProject = sessionStorage.getItem('currentProject');
+  projectForm.setInput(0, currentProject);
 }
 
-document.forms['createProject'].addEventListener('submit', event => {
+projectForm.form.addEventListener('submit', event => {
   event.preventDefault(); // Prevent the default form submission
 
-  currentProject = event.currentTarget.projectTxt.value;
+  currentProject = event.currentTarget.input0.value;
   // Save if cache
   sessionStorage.setItem('currentProject',currentProject);
 
