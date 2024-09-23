@@ -6,8 +6,8 @@ FROM nginx:alpine
 # Copy the custom Nginx configuration file
 COPY ./config/nginx.conf /etc/nginx/nginx.conf
 
-# Copy the frontend files into the Nginx HTML folder
-COPY ./frontend /usr/share/nginx/html
+# Copy the files into the Nginx HTML folder
+COPY ./src /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
