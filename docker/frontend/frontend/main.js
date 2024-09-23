@@ -1,5 +1,4 @@
-import { StatusBar } from "./elements/statusbar.js"
-const statusBar = new StatusBar(undefined, "No project specified")
+const statusBar = document.getElementsByTagName('status-bar')[0];
 
 const body = document.body;
 const uploadWorkflowForm = document.forms['uploadWorkflowForm'];
@@ -25,7 +24,7 @@ document.forms['createProject'].addEventListener('submit', event => {
   uploadWorkflowForm.elements['uploadBtn'].disabled = false;
   uploadDataForm.elements['uploadBtn'].disabled = false;
 
-  statusBar.message('info',`Current project: ${currentProject}`);
+  statusBar.setStatus('info',`Current project: ${currentProject}`);
 });
 
 uploadWorkflowForm.addEventListener('submit', uploadFolder, false)
@@ -58,7 +57,7 @@ function uploadFolder(event) {
     clearProjectBtn.disabled = false;
     processFilesBtn.disabled = false;
 
-    statusBar.message('success', `${type}: ${data.message}`);
+    statusBar.setStatus('success', `${type}: ${data.message}`);
   })
   .catch(error => {
     console.error('Error uploading folder:', error);
@@ -161,7 +160,7 @@ clearProjectBtn.addEventListener('click', function() {
   })
   .then(response => response.json())
   .then(data => {
-    statusBar.message('success',data.message)
+    statusBar.setStatus('success',data.message)
 
     spinner.style.display = 'none';
     body.classList.remove('blurred');
@@ -191,7 +190,7 @@ processFilesBtn.addEventListener('click', function() {
   })
   .then(response => response.json())
   .then(data => {
-    statusBar.message('success',`${data.message} Results are available at ${data.file}`)
+    statusBar.setStatus('success',`${data.message} Results are available at ${data.file}`)
 
     spinner.style.display = 'none';
     body.classList.remove('blurred');
