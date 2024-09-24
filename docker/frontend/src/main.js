@@ -9,22 +9,60 @@ const spinner = document.getElementById('spinner');
 
 // Sets or reloads variables
 let currentPath = '';
-let currentProject = '';
+const currentProject = new Proxy({name: ""},{
+  set(target, propery, value) {
+    if (typeof value == "string") {
+      target[propery] = value;
+
+      currentPath = value;
+
+      // Save it in cache
+      sessionStorage.setItem("currentProject", value);
+
+      projectForm.setField("projectName", value);
+
+      if (! value.length) { 
+        statusBar.setStatus('info', `No project is specified`);
+        fetchFolderContents("");
+        return true 
+      }
+
+      uploadForm.form.elements['submitBtn'].disabled = false;
+      statusBar.setStatus('info', `Current project: ${value}`);
+      
+      const fetchMakeDir = fetch(`/api/storage/mkdir/${value}`, {
+        method: 'POST'
+      })
+        .then(response => response.json())
+        .then(response => {
+          // Optionally refresh the page to reflect the results
+          console.log(response.message);
+          clearProjectBtn.disabled = false;
+
+          return fetchFolderContents(value);
+        })
+        .catch(error => {
+          console.error("Error occurred during fetch",error);
+
+          return false;
+        });    
+      return fetchMakeDir;  
+    } else {
+      console.error("Error occurred",error);
+
+      return false;
+    };
+  }
+});
+
 if (sessionStorage.getItem('currentProject')) {
-  currentProject = sessionStorage.getItem('currentProject');
-  projectForm.setInput("projectName", currentProject);
+  currentProject.name = sessionStorage.getItem('currentProject');
 }
 
 projectForm.form.addEventListener('submit', event => {
   event.preventDefault(); // Prevent the default form submission
 
-  currentProject = event.currentTarget.projectName.value;
-  // Save if cache
-  sessionStorage.setItem('currentProject', currentProject);
-
-  uploadForm.form.elements['submitBtn'].disabled = false;
-
-  statusBar.setStatus('info', `Current project: ${currentProject}`);
+  currentProject.name = event.currentTarget.projectName.value; 
 });
 
 uploadForm.form.addEventListener('submit', uploadFolders, false)
@@ -36,25 +74,17 @@ function uploadFolders(event) {
   spinner.style.display = 'block';
   body.classList.add('blurred');
 
-  const formData = new FormData(this);
-  const uniqueFields = [...new Set([...formData.keys()])];
+  const formData = new FormData(this)
 
   const promises = [];
 
-  for (const fieldToSend of uniqueFields) {
-    let dataType = fieldToSend.slice("files[]".length);
+  for (const fieldToSend of uploadForm.fields) {
+    const dataToSend = new FormData()
+    for (const f of formData.getAll(fieldToSend)) { dataToSend.append("files",f) };
 
-    // remove all but the fieldToSend
-    const currentFormData = new FormData(this)
-    for (const fieldToDelete of uniqueFields) {
-      if (fieldToDelete != fieldToSend) {
-        currentFormData.delete(fieldToDelete);
-      };
-    }
-
-    promises.push(fetch(`/api/storage/upload/${currentProject}/${dataType}`, {
+    promises.push(fetch(`/api/storage/upload/${currentProject.name}/${fieldToSend.slice("files[]".length)}`, {
       method: 'POST',
-      body: currentFormData
+      body: dataToSend
     })
     .then(response => response.json().then(data => {      
       console.log(`Success uploading folder: ${data.message}`, data.files);
@@ -74,8 +104,7 @@ function uploadFolders(event) {
 
   Promise.all(promises)
     .then((responses) => {
-      console.log(responses[0]);
-      console.log(responses[1]);
+      for (const resp of responses) { console.log(resp.status, resp.reponse) };
 
       clearProjectBtn.disabled = false;
       processFilesBtn.disabled = false;
@@ -94,16 +123,17 @@ function fetchFolderContents(path) {
     .then(data => {
       if (data.error) {
         alert(data.error);
+        return false;
       } else {
         displayFiles(data);
+        return true;
       }
     });
 }
 
 // Function to display files and folders in the list
 function displayFiles(items) {
-  if (items.length && currentProject) {
-    clearProjectBtn.disabled = false;
+  if (items.length && currentProject.name) {
     processFilesBtn.disabled = false;
   }
 
@@ -175,7 +205,7 @@ clearProjectBtn.addEventListener('click', function () {
   body.classList.add('blurred');
 
   // Send a request to trigger file processing
-  fetch(`/api/storage/clear/${currentProject}`, {
+  fetch(`/api/storage/clear/${currentProject.name}`, {
     method: 'DELETE'
   })
     .then(response => response.json())
@@ -185,8 +215,7 @@ clearProjectBtn.addEventListener('click', function () {
       spinner.style.display = 'none';
       body.classList.remove('blurred');
 
-      // Optionally refresh the page to reflect the results
-      window.location.reload();
+      currentProject.name = "";
 
       clearProjectBtn.disabled = true;
       processFilesBtn.disabled = true;
@@ -205,7 +234,7 @@ processFilesBtn.addEventListener('click', function () {
   body.classList.add('blurred');
 
   // Send a request to trigger file processing
-  fetch(`/api/processor/process-data/${currentProject}`, {
+  fetch(`/api/processor/process-data/${currentProject.name}`, {
     method: 'POST'
   })
     .then(response => response.json())
@@ -226,4 +255,4 @@ processFilesBtn.addEventListener('click', function () {
     });
 });
 // Initial load of root folder
-fetchFolderContents('');
+fetchFolderContents(currentPath);

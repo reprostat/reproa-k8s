@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from pathlib import Path
 
 # Define storage folder using pathlib
-STORAGE_FOLDER = Path('storage')
+STORAGE_FOLDER = Path('/app/storage')
 
 # Ensure storage folder exists
 STORAGE_FOLDER.mkdir(parents=True, exist_ok=True)
@@ -16,19 +16,25 @@ ALLOWED_EXTENSIONS = {'', # unspecified (e.g., for README)
 # Create Flask app
 app = Flask(__name__)
 
+# Folder creation endpoint
+@app.route('/mkdir/<path:folder_path>', methods=['POST'])
+def make_folder(folder_path=""):
+    new_folder = STORAGE_FOLDER / folder_path
+    try:
+        new_folder.mkdir(parents=True, exist_ok=True)
+        return jsonify({'message': f'Folder {str(new_folder)} created successfully', 'folder': str(new_folder)}), 200
+    except Exception as e:
+        return jsonify({'message': f'Unable clear folder {str(new_folder)} - {str(e)}'}), 500
+
 # Upload endpoint - allows folder upload by handling multiple files
 @app.route('/upload/<path:folder_path>', methods=['POST'])
 def upload_files(folder_path=""):
     # Check if files were uploaded (allow suffix)
-    primary_files_key = 'files[]'
-    files_key = [k for k in request.files.keys() if k.startswith(primary_files_key)]
-    if not(len(files_key)):
-        return jsonify({'message': f'No "{primary_files_key}*" part in the request'}), 400
-    elif len(files_key) > 1:
-        return jsonify({'message': f'Mutliple "{primary_files_key}*" part in the request'}), 400
+    if not("files" in request.files.keys()):
+        return jsonify({'message': f'No "files" in the request with {request.files.keys()}'}), 400
     
     # Get the list of files
-    files = request.files.getlist(files_key[0])
+    files = request.files.getlist("files")
     
     if not files:
         return jsonify({'message': 'No files selected'}), 400

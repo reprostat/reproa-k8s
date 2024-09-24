@@ -50,14 +50,14 @@ class BaseForm extends HTMLElement {
      * @param {number} inputInd
      * @param {any} inputValue
      */
-    setInput(fieldName, inputValue) {
+    setField(fieldName, inputValue) {
         this.form[fieldName].value = inputValue;
     }
 
         /**
      * @param {number} inputInd
      */
-    getInput(fieldName) {
+    getField(fieldName) {
         return this.form[fieldName].value;
     }
 
