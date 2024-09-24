@@ -15,3 +15,6 @@ case $1 in
         echo "Invalid argument"
         ;;
 esac
+
+export POD_FRONTEND=$(kubectl get pods -n reproa -l app=reproa-frontend -o name)
+export POD_API=$(kubectl get pods -n reproa -l app=reproa-api -o name)
