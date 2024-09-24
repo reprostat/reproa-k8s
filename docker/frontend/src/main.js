@@ -60,51 +60,55 @@ if (sessionStorage.getItem('currentProject')) {
 }
 
 projectForm.form.addEventListener('submit', event => {
-  event.preventDefault(); // Prevent the default form submission
+  event.preventDefault();
 
   currentProject.name = event.currentTarget.projectName.value; 
 });
 
-uploadForm.form.addEventListener('submit', uploadFolders, false)
-
-function uploadFolders(event) {
-  event.preventDefault(); // Prevent the default form submission
+uploadForm.form.addEventListener('submit', event => {
+  event.preventDefault();
 
   // Show spinner and add blur effect
   spinner.style.display = 'block';
   body.classList.add('blurred');
 
-  const formData = new FormData(this)
-
   const promises = [];
 
   for (const fieldToSend of uploadForm.fields) {
     const dataToSend = new FormData()
-    for (const f of formData.getAll(fieldToSend)) { dataToSend.append("files",f) };
+    for (const f of uploadForm.getField(fieldToSend)) { dataToSend.append("files",f) };
 
-    promises.push(fetch(`/api/storage/upload/${currentProject.name}/${fieldToSend.slice("files[]".length)}`, {
+    promises.push(fetch(`/api/storage/upload/${currentProject.name}/${fieldToSend}`, {
       method: 'POST',
       body: dataToSend
     })
     .then(response => response.json().then(data => {      
-      console.log(`Success uploading folder: ${data.message}`, data.files);
+      console.log(data.message, data.files);
       return {
         status: response.status,
-        reponse: data
+        field: fieldToSend,
+        response: data.message
       };
     }))
     .catch(error => {
       console.error('Error uploading folder:', error);
       return {
         status: response.status,
-        reponse: error
+        field: fieldToSend,
+        response: error // TODO: extract message
       };
     }));
   };
 
   Promise.all(promises)
-    .then((responses) => {
-      for (const resp of responses) { console.log(resp.status, resp.reponse) };
+    .then(responses => {
+      let status = [];
+      let message = [];
+      for (const resp of responses) { 
+        if (resp.status == 200) { status.push("success") } else { status.push("error") };
+        message.push(resp.field + ": " + resp.response);
+      };
+      statusBar.setStatus(status, message);
 
       clearProjectBtn.disabled = false;
       processFilesBtn.disabled = false;
@@ -114,7 +118,7 @@ function uploadFolders(event) {
 
       fetchFolderContents(currentProject.name);
     });
-};
+});
 
 // Function to fetch and display files and folders
 function fetchFolderContents(path) {

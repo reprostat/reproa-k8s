@@ -1,11 +1,16 @@
 /* Status */
-.status {
+.container.statusbar {
+    display: flex;
+    flex-flow: column;
+    text-align: left;
     position: sticky;
     bottom: 0;
     left: 25vw;
     width: auto;
     min-width: 25vw;
+}
 
+.status {
     padding: 4px 12px;
     background-color: rgb(192, 192, 192);
     color: rgb(64, 64, 64);
@@ -14,6 +19,12 @@
 
 .status p {
     font-size: 18px
+}
+
+.status p strong {
+    font-weight: bold;
+    display: inline-block;
+    min-width: 92px;
 }
 
 .status.success {

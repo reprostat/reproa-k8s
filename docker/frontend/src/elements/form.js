@@ -1,15 +1,14 @@
 import { getRandomString } from "../utils.js";
 
 class BaseForm extends HTMLElement {
-    constructor () {
+    constructor() {
         super();
         this.formId = getRandomString();
-        this.type = "";
+        this.type = "";        
     }
 
-
     connectedCallback() {
-        this.className = `container ${this.getAttribute("flow")}`;        
+        this.className = `container ${this.getAttribute("flow")}`;
 
         let htmlText = `
             <h2>${this.getAttribute("title")}</h2>
@@ -17,10 +16,10 @@ class BaseForm extends HTMLElement {
         `;
 
         let prompts = JSON.parse(this.getAttribute("prompts"));
-        
+
         this.fields = JSON.parse(this.getAttribute("fields"));
-        
-        for (let inputInd=0; inputInd<prompts.length; inputInd++) {
+
+        for (let inputInd = 0; inputInd < prompts.length; inputInd++) {
             htmlText += `                
                     <label for="form${this.formId}Input${inputInd}">${prompts[inputInd]}</label>
                     ${this.generateInputHTML(inputInd, prompts.length)}
@@ -37,61 +36,79 @@ class BaseForm extends HTMLElement {
     /**
      * @param {number} inputInd
      * @param {number} inputN
+     * @returns {string}
      */
     generateInputHTML(inputInd, inputN) {
         return `<input id="form${this.formId}Input${inputInd}" type="${this.type}" name="${this.fields[inputInd]}" required>`;
     }
 
+    /**
+     * @returns {form}
+     */
     get form() {
         return this.getElementsByTagName('form')[0];
     }
 
     /**
-     * @param {number} inputInd
+     * @param {string} fieldName
      * @param {any} inputValue
      */
     setField(fieldName, inputValue) {
         this.form[fieldName].value = inputValue;
     }
 
-        /**
-     * @param {number} inputInd
+    /**
+     * @param {string} fieldName
+     * @returns {any}
      */
     getField(fieldName) {
         return this.form[fieldName].value;
     }
-
-    getFormData() {
-        return new FormData(this.form)
-    }
 }
 
 export class TextForm extends BaseForm {
-    constructor () {
+    constructor() {
         super();
         this.type = "text";
     }
 }
 
 export class FolderForm extends BaseForm {
-    constructor () {
+    constructor() {
         super();
-        this.type = "file";
+        this.type = "file";        
     }
 
     /**
      * @param {number} inputIn 
      * @param {number} inputN
+     * @returns {string}
      */
     generateInputHTML(inputInd, inputN) {
         let inputHTML = `<input id="form${this.formId}Input${inputInd}" type="${this.type}" name="${this.fields[inputInd]}" multiple webkitdirectory required>`;
-        if (inputInd == inputN-1) {
+        if (inputInd == inputN - 1) {
             inputHTML += `
             <input type="submit" name="submitBtn" value="Submit Folder" disabled>`
-        }        
+        }
         return inputHTML;
+    }
+
+     /**
+     * @param {string} fieldName
+     * @param {FileList} inputValue
+     */
+    setField(fieldName, inputValue) {
+        this.form[fieldName].files = inputValue;
+    }
+
+    /**
+     * @param {string} fieldName
+     * @returns {FileList}
+     */
+    getField(fieldName) {
+        return this.form[fieldName].files;
     }
 }
 
-customElements.define('text-form', TextForm, {extends: "section"});
-customElements.define('folder-form', FolderForm, {extends: "section"});
+customElements.define('text-form', TextForm, { extends: "section" });
+customElements.define('folder-form', FolderForm, { extends: "section" });
