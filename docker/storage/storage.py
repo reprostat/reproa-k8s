@@ -19,12 +19,16 @@ app = Flask(__name__)
 # Upload endpoint - allows folder upload by handling multiple files
 @app.route('/upload/<path:folder_path>', methods=['POST'])
 def upload_files(folder_path=""):
-    # Check if files were uploaded
-    if 'files[]' not in request.files:
-        return jsonify({'message': 'No files part in the request'}), 400
+    # Check if files were uploaded (allow suffix)
+    primary_files_key = 'files[]'
+    files_key = [k for k in request.files.keys() if k.startswith(primary_files_key)]
+    if not(len(files_key)):
+        return jsonify({'message': f'No "{primary_files_key}*" part in the request'}), 400
+    elif len(files_key) > 1:
+        return jsonify({'message': f'Mutliple "{primary_files_key}*" part in the request'}), 400
     
     # Get the list of files
-    files = request.files.getlist('files[]')
+    files = request.files.getlist(files_key[0])
     
     if not files:
         return jsonify({'message': 'No files selected'}), 400

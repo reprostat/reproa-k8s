@@ -11,28 +11,11 @@
 <body>
 <div class="spinner" id="spinner"></div>
 
-<text-form id="projectForm" title="Project" prompts='["Enter the name of the project"]' flow="vertical"></text-form>
+<text-form id="projectForm" title="Project" prompts='["Enter the name of the project"]' fields='["projectName"]' flow="vertical"></text-form>
 
 <hr>
 
-<section class="container horizontal">
-  <section class="container vertical">
-    <h2>Workflow</h2>
-    <form id="uploadWorkflowForm" enctype="multipart/form-data">
-      <label for="files">Select folder to upload</label>
-      <input type="file" name="files[]" id="files" multiple webkitdirectory required>
-      <input type="submit" name="uploadBtn" value="Upload Folder" disabled>
-    </form>
-  </section>
-  <section class="container vertical">
-    <h2>Data</h2>
-    <form id="uploadDataForm" enctype="multipart/form-data">
-      <label for="files">Select folder to upload</label>
-      <input type="file" name="files[]" id="files" multiple webkitdirectory required>
-      <input type="submit" name="uploadBtn" value="Upload Folder" disabled>
-    </form>
-  </section>
-</section>
+<folder-form id="uploadForm" title="Upload" prompts='["Select the workflow folder", "Select the data folder"]' fields='["files[]Workflow", "files[]Data"]' flow="vertical"></folder-form>
 
 <hr>
 

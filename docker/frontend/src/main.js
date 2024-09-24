@@ -2,8 +2,7 @@ const statusBar = document.getElementsByTagName('status-bar')[0];
 
 const body = document.body;
 const projectForm = document.getElementById('projectForm')
-const uploadWorkflowForm = document.forms['uploadWorkflowForm'];
-const uploadDataForm = document.forms['uploadDataForm'];
+const uploadForm = document.getElementById('uploadForm');
 const clearProjectBtn = document.getElementById('clearProjectBtn');
 const processFilesBtn = document.getElementById('processFilesBtn');
 const spinner = document.getElementById('spinner');
@@ -11,62 +10,81 @@ const spinner = document.getElementById('spinner');
 // Sets or reloads variables
 let currentPath = '';
 let currentProject = '';
-if (sessionStorage.getItem('currentProject')){
+if (sessionStorage.getItem('currentProject')) {
   currentProject = sessionStorage.getItem('currentProject');
-  projectForm.setInput(0, currentProject);
+  projectForm.setInput("projectName", currentProject);
 }
 
 projectForm.form.addEventListener('submit', event => {
   event.preventDefault(); // Prevent the default form submission
 
-  currentProject = event.currentTarget.input0.value;
+  currentProject = event.currentTarget.projectName.value;
   // Save if cache
-  sessionStorage.setItem('currentProject',currentProject);
+  sessionStorage.setItem('currentProject', currentProject);
 
-  uploadWorkflowForm.elements['uploadBtn'].disabled = false;
-  uploadDataForm.elements['uploadBtn'].disabled = false;
+  uploadForm.form.elements['submitBtn'].disabled = false;
 
-  statusBar.setStatus('info',`Current project: ${currentProject}`);
+  statusBar.setStatus('info', `Current project: ${currentProject}`);
 });
 
-uploadWorkflowForm.addEventListener('submit', uploadFolder, false)
-uploadDataForm.addEventListener('submit', uploadFolder, false)
+uploadForm.form.addEventListener('submit', uploadFolders, false)
 
-function uploadFolder(event) {
+function uploadFolders(event) {
   event.preventDefault(); // Prevent the default form submission
-
-  let type = /(?<=upload).*(?=Form)/.exec(event.currentTarget.id)
-
-  const formData = new FormData(this);
 
   // Show spinner and add blur effect
   spinner.style.display = 'block';
   body.classList.add('blurred');
 
-  fetch(`/api/storage/upload/${currentProject}/${type}`, {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {      
-    console.log(data.message, data.files);
+  const formData = new FormData(this);
+  const uniqueFields = [...new Set([...formData.keys()])];
 
-    spinner.style.display = 'none';
-    body.classList.remove('blurred');
+  const promises = [];
 
-    window.location.reload(); // Reload to show updated file list
+  for (const fieldToSend of uniqueFields) {
+    let dataType = fieldToSend.slice("files[]".length);
 
-    clearProjectBtn.disabled = false;
-    processFilesBtn.disabled = false;
+    // remove all but the fieldToSend
+    const currentFormData = new FormData(this)
+    for (const fieldToDelete of uniqueFields) {
+      if (fieldToDelete != fieldToSend) {
+        currentFormData.delete(fieldToDelete);
+      };
+    }
 
-    statusBar.setStatus('success', `${type}: ${data.message}`);
-  })
-  .catch(error => {
-    console.error('Error uploading folder:', error);
+    promises.push(fetch(`/api/storage/upload/${currentProject}/${dataType}`, {
+      method: 'POST',
+      body: currentFormData
+    })
+    .then(response => response.json().then(data => {      
+      console.log(`Success uploading folder: ${data.message}`, data.files);
+      return {
+        status: response.status,
+        reponse: data
+      };
+    }))
+    .catch(error => {
+      console.error('Error uploading folder:', error);
+      return {
+        status: response.status,
+        reponse: error
+      };
+    }));
+  };
 
-    spinner.style.display = 'none';
-    body.classList.remove('blurred');
-  });
+  Promise.all(promises)
+    .then((responses) => {
+      console.log(responses[0]);
+      console.log(responses[1]);
+
+      clearProjectBtn.disabled = false;
+      processFilesBtn.disabled = false;
+
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+
+      window.location.reload(); // Reload to show updated file list
+    });
 };
 
 // Function to fetch and display files and folders
@@ -83,7 +101,7 @@ function fetchFolderContents(path) {
 }
 
 // Function to display files and folders in the list
-function displayFiles(items) {  
+function displayFiles(items) {
   if (items.length && currentProject) {
     clearProjectBtn.disabled = false;
     processFilesBtn.disabled = false;
@@ -95,7 +113,7 @@ function displayFiles(items) {
   items.forEach(item => {
     const li = document.createElement('li');
     li.textContent = item.name;
-    
+
     if (item.type === 'folder') {
       li.classList.add('folder');
       li.addEventListener('click', () => navigateToFolder(item.name));
@@ -120,7 +138,7 @@ function navigateToFolder(folderName) {
 function navigateToPath(pathIndex) {
   const pathArray = currentPath.split('/');
   currentPath = pathArray.slice(0, pathIndex + 1).join('/');
-  sessionStorage.setItem('currentPath',currentPath);
+  sessionStorage.setItem('currentPath', currentPath);
   fetchFolderContents(currentPath);
 }
 
@@ -151,7 +169,7 @@ function downloadFile(fileName) {
   window.location.href = downloadUrl;
 }
 
-clearProjectBtn.addEventListener('click', function() {
+clearProjectBtn.addEventListener('click', function () {
   // Show spinner and add blur effect
   spinner.style.display = 'block';
   body.classList.add('blurred');
@@ -160,28 +178,28 @@ clearProjectBtn.addEventListener('click', function() {
   fetch(`/api/storage/clear/${currentProject}`, {
     method: 'DELETE'
   })
-  .then(response => response.json())
-  .then(data => {
-    statusBar.setStatus('success',data.message)
+    .then(response => response.json())
+    .then(data => {
+      statusBar.setStatus('success', data.message)
 
-    spinner.style.display = 'none';
-    body.classList.remove('blurred');
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
 
-    // Optionally refresh the page to reflect the results
-    window.location.reload();
+      // Optionally refresh the page to reflect the results
+      window.location.reload();
 
-    clearProjectBtn.disabled = true;
-    processFilesBtn.disabled = true;      
-  })
-  .catch(error => {
-    console.error('Error clearing storage:', error);
+      clearProjectBtn.disabled = true;
+      processFilesBtn.disabled = true;
+    })
+    .catch(error => {
+      console.error('Error clearing storage:', error);
 
-    spinner.style.display = 'none';
-    body.classList.remove('blurred');
-  });
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+    });
 });
 
-processFilesBtn.addEventListener('click', function() {
+processFilesBtn.addEventListener('click', function () {
   // Show spinner and add blur effect
   spinner.style.display = 'block';
   body.classList.add('blurred');
@@ -190,22 +208,22 @@ processFilesBtn.addEventListener('click', function() {
   fetch(`/api/processor/process-data/${currentProject}`, {
     method: 'POST'
   })
-  .then(response => response.json())
-  .then(data => {
-    statusBar.setStatus('success',`${data.message} Results are available at ${data.file}`)
+    .then(response => response.json())
+    .then(data => {
+      statusBar.setStatus('success', `${data.message} Results are available at ${data.file}`)
 
-    spinner.style.display = 'none';
-    body.classList.remove('blurred');
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
 
-    // Optionally refresh the page to reflect the results
-    window.location.reload();
-  })
-  .catch(error => {
-    console.error('Error processing files:', error);
+      // Optionally refresh the page to reflect the results
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error processing files:', error);
 
-    spinner.style.display = 'none';
-    body.classList.remove('blurred');
-  });
+      spinner.style.display = 'none';
+      body.classList.remove('blurred');
+    });
 });
 // Initial load of root folder
 fetchFolderContents('');
