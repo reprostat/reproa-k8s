@@ -112,7 +112,7 @@ function uploadFolders(event) {
       spinner.style.display = 'none';
       body.classList.remove('blurred');
 
-      window.location.reload(); // Reload to show updated file list
+      fetchFolderContents(currentProject.name);
     });
 };
 
@@ -244,8 +244,7 @@ processFilesBtn.addEventListener('click', function () {
       spinner.style.display = 'none';
       body.classList.remove('blurred');
 
-      // Optionally refresh the page to reflect the results
-      window.location.reload();
+      fetchFolderContents(currentProject.name);
     })
     .catch(error => {
       console.error('Error processing files:', error);
