@@ -1,0 +1,11 @@
+.container {
+    display: flex;
+    margin: 15px;
+    text-align: center;
+}
+.container.horizontal {
+    flex-flow: row;
+}
+.container.vertical {
+    flex-flow: column;
+}

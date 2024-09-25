@@ -1,6 +1,7 @@
+@import url("./container.css");
+
 /* Status */
 .container.statusbar {
-    display: flex;
     flex-flow: column;
     text-align: left;
     position: sticky;
