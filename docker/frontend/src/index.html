@@ -6,6 +6,7 @@
     <title>reproa-k8s</title>
     <link rel="stylesheet" href="main.css">
     <script src="elements/form.js" type="module" defer></script>
+    <script src="elements/filebrowser.js" type="module" defer></script>
     <script src="elements/statusbar.js" type="module" defer></script>
 </head>
 <body>
@@ -19,18 +20,7 @@
 
 <hr>
 
-<section class="container vertical">
-  <h2>Uploaded Files</h2>
-  <div class="file-browser">
-    <!-- Breadcrumb for navigation -->
-    <div id="breadcrumb"></div>
-
-    <hr style="margin-bottom: 0px;">
-
-    <!-- File and folder list -->
-    <ul id="file-list"></ul>
-  </div>
-</section>
+<file-browser title="Upload" filesendpoint="/api/storage/files" downloadendpoint="/api/storage/download"></file-browser>
 
 <hr>
 

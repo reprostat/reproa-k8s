@@ -1,3 +1,4 @@
+const fileBrowser = document.getElementsByTagName('file-browser')[0];
 const statusBar = document.getElementsByTagName('status-bar')[0];
 
 const body = document.body;
@@ -8,13 +9,12 @@ const processFilesBtn = document.getElementById('processFilesBtn');
 const spinner = document.getElementById('spinner');
 
 // Sets or reloads variables
-let currentPath = '';
 const currentProject = new Proxy({name: ""},{
   set(target, propery, value) {
     if (typeof value == "string") {
       target[propery] = value;
 
-      currentPath = value;
+      fileBrowser.currentPath = value;
 
       // Save it in cache
       sessionStorage.setItem("currentProject", value);
@@ -24,7 +24,7 @@ const currentProject = new Proxy({name: ""},{
       if (! value.length) { 
         statusBar.setStatus('info', `No project is specified`);
         uploadForm.form.elements['submitBtn'].disabled = true;
-        fetchFolderContents("");
+        fileBrowser.fetchFolderContents("");
         return true 
       }
 
@@ -40,7 +40,7 @@ const currentProject = new Proxy({name: ""},{
           console.log(response.message);
           clearProjectBtn.disabled = false;
 
-          return fetchFolderContents(value);
+          return fileBrowser.fetchFolderContents(value);
         })
         .catch(error => {
           console.error("Error occurred during fetch",error);
@@ -117,92 +117,9 @@ uploadForm.form.addEventListener('submit', event => {
       spinner.style.display = 'none';
       body.classList.remove('blurred');
 
-      fetchFolderContents(currentProject.name);
+      fileBrowser.fetchFolderContents(currentProject.name);
     });
 });
-
-// Function to fetch and display files and folders
-function fetchFolderContents(path) {
-  fetch(`/api/storage/files/${path}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.error) {
-        alert(data.error);
-        return false;
-      } else {
-        displayFiles(data);
-        return true;
-      }
-    });
-}
-
-// Function to display files and folders in the list
-function displayFiles(items) {
-  if (items.length && currentProject.name) {
-    processFilesBtn.disabled = false;
-  }
-
-  const fileList = document.getElementById('file-list');
-  fileList.innerHTML = '';
-
-  items.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = item.name;
-
-    if (item.type === 'folder') {
-      li.classList.add('folder');
-      li.addEventListener('click', () => navigateToFolder(item.name));
-    } else {
-      li.classList.add('file');
-      li.addEventListener('click', () => downloadFile(item.name));
-    }
-
-    fileList.appendChild(li);
-  });
-
-  updateBreadcrumb();
-}
-
-// Function to navigate into a folder
-function navigateToFolder(folderName) {
-  currentPath += (currentPath ? '/' : '') + folderName;
-  fetchFolderContents(currentPath);
-}
-
-// Function to go back in the breadcrumb
-function navigateToPath(pathIndex) {
-  const pathArray = currentPath.split('/');
-  currentPath = pathArray.slice(0, pathIndex + 1).join('/');
-  sessionStorage.setItem('currentPath', currentPath);
-  fetchFolderContents(currentPath);
-}
-
-// Function to update breadcrumb navigation
-function updateBreadcrumb() {
-  const breadcrumb = document.getElementById('breadcrumb');
-  breadcrumb.innerHTML = '';
-
-  // Prefix
-  const span = document.createElement('span');
-  span.textContent = 'Path';
-  span.classList.add('breadcrumb-item');
-  breadcrumb.appendChild(span);
-
-  const pathArray = currentPath.split('/');
-  pathArray.forEach((dir, index) => {
-    const span = document.createElement('span');
-    span.textContent = dir || 'storage';
-    span.classList.add('breadcrumb-item');
-    span.addEventListener('click', () => navigateToPath(index));
-    breadcrumb.appendChild(span);
-  });
-}
-
-// Function to download a file
-function downloadFile(fileName) {
-  const downloadUrl = `/api/storage/download/${currentPath ? currentPath + '/' : ''}${fileName}`;
-  window.location.href = downloadUrl;
-}
 
 clearProjectBtn.addEventListener('click', function () {
   // Show spinner and add blur effect
@@ -249,7 +166,7 @@ processFilesBtn.addEventListener('click', function () {
       spinner.style.display = 'none';
       body.classList.remove('blurred');
 
-      fetchFolderContents(currentProject.name);
+      fileBrowser.fetchFolderContents(currentProject.name);
     })
     .catch(error => {
       console.error('Error processing files:', error);
@@ -259,4 +176,4 @@ processFilesBtn.addEventListener('click', function () {
     });
 });
 // Initial load of root folder
-fetchFolderContents(currentPath);
+fileBrowser.fetchFolderContents();

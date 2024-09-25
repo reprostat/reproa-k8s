@@ -1,0 +1,63 @@
+/* File browser */
+.file-pane {
+    background-color: rgba(38, 40, 55, 0.6);
+    /* Card-like dark blue background */
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    margin-bottom: 0px;
+
+    color: #d1e7ff;
+    text-align: left;
+}
+
+.breadcrumb {
+    margin-bottom: 10px;
+}
+
+.breadcrumb-item {
+    display: inline-block;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+/* Separator */
+.breadcrumb-item:after {
+    content: ">";
+    margin-left: 5px;
+}
+
+/* Prefix */
+.breadcrumb-item:first-child {
+    text-decoration: none;
+    cursor: auto;
+}
+
+.breadcrumb-item:first-child:after {
+    content: ":";
+}
+
+/* No seperator after the last */
+.breadcrumb-item:last-child:after {
+    content: "";
+}
+
+.file-pane ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.file-pane li {
+    padding: 8px 0;
+}
+
+.folder {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.file {
+    cursor: pointer;
+}
