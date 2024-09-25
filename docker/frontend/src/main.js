@@ -23,6 +23,7 @@ const currentProject = new Proxy({name: ""},{
 
       if (! value.length) { 
         statusBar.setStatus('info', `No project is specified`);
+        uploadForm.form.elements['submitBtn'].disabled = true;
         fetchFolderContents("");
         return true 
       }
